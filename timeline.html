@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrepreneurship Timeline</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 1rem; }
+    .event { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
+    .event-title { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Entrepreneurship History Timeline</h1>
+  <div id="events"></div>
+
+  <h2>Add Event</h2>
+  <form id="eventForm">
+    <input type="text" id="title" placeholder="Event Title" required><br>
+    <textarea id="description" placeholder="Event Description" required></textarea><br>
+    <input type="date" id="eventDate" required><br>
+    <input type="url" id="imageUrl" placeholder="Image URL"><br>
+    <button type="submit">Add Event</button>
+  </form>
+
+  <script>
+    const SUPABASE_URL = 'https://your-project.supabase.co';
+    const SUPABASE_KEY = 'your-public-anon-key';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadEvents() {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) return console.error('Error loading events:', error);
+
+      const container = document.getElementById('events');
+      container.innerHTML = '';
+
+      data.forEach(event => {
+        const div = document.createElement('div');
+        div.className = 'event';
+        div.innerHTML = `
+          <div class="event-title">${event.title} (${new Date(event.event_date).getFullYear()})</div>
+          <div>${event.description}</div>
+          ${event.image_url ? `<img src="${event.image_url}" width="200" />` : ''}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById('eventForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const eventDate = document.getElementById('eventDate').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+
+      const { data, error } = await supabase.from('events').insert([
+        { title, description, event_date: eventDate, image_url: imageUrl }
+      ]);
+
+      if (error) {
+        alert('Failed to add event');
+        console.error(error);
+      } else {
+        loadEvents();
+        e.target.reset();
+      }
+    });
+
+    loadEvents();
+  </script>
+</body>
+</html>
