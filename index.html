@@ -9,14 +9,25 @@
     body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 1rem; }
     .event { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
     .event-title { font-weight: bold; }
+    #authSection { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f9f9f9; }
+    #logoutButton { display: none; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
   <h1>Entrepreneurship History Timeline</h1>
+
+  <div id="authSection">
+    <p><strong>Login to contribute:</strong></p>
+    <input type="email" id="loginEmail" placeholder="Enter your email" required />
+    <button onclick="login()">Send Magic Link</button>
+  </div>
+
+  <button id="logoutButton" onclick="logout()">Log Out</button>
+
   <div id="events"></div>
 
   <h2>Add Event</h2>
-  <form id="eventForm">
+  <form id="eventForm" style="display:none">
     <input type="text" id="title" placeholder="Event Title" required><br>
     <textarea id="description" placeholder="Event Description" required></textarea><br>
     <input type="date" id="eventDate" required><br>
@@ -59,8 +70,10 @@
       const eventDate = document.getElementById('eventDate').value;
       const imageUrl = document.getElementById('imageUrl').value;
 
+      const user = (await supabase.auth.getUser()).data.user;
+
       const { data, error } = await supabase.from('events').insert([
-        { title, description, event_date: eventDate, image_url: imageUrl }
+        { title, description, event_date: eventDate, image_url: imageUrl, user_id: user.id }
       ]);
 
       if (error) {
@@ -69,6 +82,39 @@
       } else {
         loadEvents();
         e.target.reset();
+      }
+    });
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Check your email for the magic login link.');
+      }
+    }
+
+    async function logout() {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        alert('Logout error: ' + error.message);
+      } else {
+        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('eventForm').style.display = 'none';
+        document.getElementById('authSection').style.display = 'block';
+      }
+    }
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        document.getElementById('eventForm').style.display = 'block';
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'inline-block';
+      } else {
+        document.getElementById('eventForm').style.display = 'none';
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('logoutButton').style.display = 'none';
       }
     });
 
