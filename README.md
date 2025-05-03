@@ -61,8 +61,8 @@ Ultimately, the goal is to foster **software fluency** and inspire creative appl
 By the end of this project, students will:
 
 - Recognize the power and limitations of AI in code generation.
-- Understand how to wire up a database‑backed SPA with minimal boilerplate.
-- Appreciate the role of authentication and role‑based access in web apps.
+- Understand how a database connects to a single page app (SPA).
+- Understand the role of authentication and role‑based access for web apps and databases.
 - Develop confidence in proposing software enhancements, even without deep coding expertise.
 
 ---
@@ -74,7 +74,7 @@ If you want to rebuild this project from scratch, you will need to carefully set
 - **GitHub** (for version control and hosting static web content)
 - **Supabase** (for authentication, database storage, and real-time updates)
 
-Beyond those services, no additional paid tools are necessary.
+Beyond those free services, no additional paid tools are necessary.
 
 ---
 
