@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Entrepreneurship Timeline</title>
-  <!-- Use the UMD bundle explicitly -->
+  <!-- Explicit UMD bundle to ensure compatibility -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
   <style>
     body {
@@ -374,13 +374,33 @@
       });
     }
 
+    // Use UPDATE instead of INSERT to flip the approval flag
     async function approveUser(id) {
-      await supabase.from('approved_users').insert([{ user_id: id, approved: true }]);
-      loadUnapprovedUsers();
+      const { error } = await supabase
+        .from('approved_users')
+        .update({ approved: true })
+        .eq('user_id', id);
+
+      if (error) {
+        console.error('Approve error:', error);
+        alert('Failed to approve user: ' + error.message);
+      } else {
+        loadUnapprovedUsers();
+      }
     }
+
     async function rejectUser(id) {
-      await supabase.from('approved_users').insert([{ user_id: id, approved: false }]);
-      loadUnapprovedUsers();
+      const { error } = await supabase
+        .from('approved_users')
+        .update({ approved: false })
+        .eq('user_id', id);
+
+      if (error) {
+        console.error('Reject error:', error);
+        alert('Failed to reject user: ' + error.message);
+      } else {
+        loadUnapprovedUsers();
+      }
     }
 
     async function checkUserApproval(userId) {
@@ -393,13 +413,11 @@
     }
 
     async function checkAdminStatus(userId) {
-      console.log('checkAdminStatus: querying roles for user', userId);
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .single();
-      console.log('checkAdminStatus result:', data, error);
       return data?.role === 'admin';
     }
 
@@ -412,34 +430,29 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // 1) Retrieve session (SDK auto-parses URL)
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log('Initial getSession:', session, sessionError);
-      // 2) Populate timeline
+      const { data: { session } } = await supabase.auth.getSession();
+
+      // Load events immediately
       await loadEvents();
 
       if (session) {
         const userId = session.user.id;
-        console.log('Authenticated as', userId);
-        // 3a) Approval logic
+
+        // Approval workflow
         const approved = await checkUserApproval(userId);
-        console.log('User approved:', approved);
         if (approved) {
           document.getElementById('eventForm').style.display = 'block';
-          document.getElementById('welcomeMessage').style.display = 'none';
         } else {
           const msg = document.getElementById('welcomeMessage');
           msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
           msg.style.display = 'block';
         }
-        // 3b) Swap buttons
+
         document.getElementById('signinButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'block';
-        // 3c) Admin check
-        console.log('About to check admin status...');
-        const isAdmin = await checkAdminStatus(userId);
-        console.log('Admin status for', userId, ':', isAdmin);
-        if (isAdmin) {
+
+        // Admin check
+        if (await checkAdminStatus(userId)) {
           document.getElementById('approvalsLink').style.display = 'list-item';
         }
       }
