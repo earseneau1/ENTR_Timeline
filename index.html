@@ -6,34 +6,48 @@
   <title>Entrepreneurship Timeline</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 1rem; }
-    .event { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
-    .event-title { font-weight: bold; }
-    #authSection { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f9f9f9; }
-    #logoutButton { display: none; margin-bottom: 1rem; }
+    body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f4; color: #333; }
+    header, footer { background-color: #003366; color: white; padding: 1rem; text-align: center; }
+    header h1, footer p { margin: 0; }
+    main { max-width: 900px; margin: auto; padding: 2rem 1rem; }
+    .event { background: white; border-left: 4px solid #0059b3; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .event-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
+    #authSection { margin-top: 2rem; padding: 1rem; border: 1px solid #ccc; background: #fff; }
+    #logoutButton { display: none; margin: 1rem 0; }
+    form input, form textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; margin-bottom: 1rem; }
+    form button { background-color: #003366; color: white; border: none; padding: 0.75rem 1rem; cursor: pointer; }
+    form button:hover { background-color: #0059b3; }
   </style>
 </head>
 <body>
-  <h1>Entrepreneurship History Timeline</h1>
+  <header>
+    <h1>Entrepreneurship History Timeline</h1>
+  </header>
 
-  <div id="authSection">
-    <p><strong>Login to contribute:</strong></p>
-    <input type="email" id="loginEmail" placeholder="Enter your email" required />
-    <button onclick="login()">Send Magic Link</button>
-  </div>
+  <main>
+    <div id="authSection">
+      <p><strong>Login to contribute:</strong></p>
+      <input type="email" id="loginEmail" placeholder="Enter your email" required />
+      <button onclick="login()">Send Magic Link</button>
+    </div>
 
-  <button id="logoutButton" onclick="logout()">Log Out</button>
+    <button id="logoutButton" onclick="logout()">Log Out</button>
 
-  <div id="events"></div>
+    <div id="events"></div>
 
-  <h2>Add Event</h2>
-  <form id="eventForm" style="display:none">
-    <input type="text" id="title" placeholder="Event Title" required><br>
-    <textarea id="description" placeholder="Event Description" required></textarea><br>
-    <input type="date" id="eventDate" required><br>
-    <input type="url" id="imageUrl" placeholder="Image URL"><br>
-    <button type="submit">Add Event</button>
-  </form>
+    <h2>Add Event</h2>
+    <form id="eventForm" style="display:none">
+      <input type="text" id="title" placeholder="Event Title" required>
+      <textarea id="description" placeholder="Event Description" required></textarea>
+      <input type="date" id="eventDate" required>
+      <input type="url" id="imageUrl" placeholder="Image URL">
+      <button type="submit">Add Event</button>
+    </form>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 TCU Entrepreneurship & Innovation Department</p>
+  </footer>
 
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
