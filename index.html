@@ -13,7 +13,7 @@
       padding: 0;
     }
     header {
-      background-color: rgba(0, 45, 98, 0.8);
+      background-color: rgba(77, 25, 121, 0.8);
       color: white;
       padding: 1rem;
       display: flex;
@@ -61,7 +61,7 @@
       max-width: 900px;
       margin: 2rem auto;
       padding: 1rem;
-      padding-bottom: 5rem; /* Space for fixed footer */
+      padding-bottom: 5rem;
     }
     #events {
       position: relative;
@@ -95,7 +95,7 @@
       width: 1rem;
       height: 1rem;
       border-radius: 50%;
-      background-color: #002D62;
+      background-color: #4D1979;
     }
     @keyframes fadeIn {
       to {
@@ -135,7 +135,7 @@
       border-radius: 4px;
     }
     .btn {
-      background-color: #002D62;
+      background-color: #4D1979;
       color: white;
       border: none;
       padding: 0.5rem 1rem;
@@ -144,7 +144,19 @@
       transition: background-color 0.3s;
     }
     .btn:hover {
-      background-color: #004494;
+      background-color: #3d144f; /* Darker shade of purple for hover */
+    }
+    .approve-btn {
+      background-color: #28a745;
+    }
+    .approve-btn:hover {
+      background-color: #218838;
+    }
+    .reject-btn {
+      background-color: #dc3545;
+    }
+    .reject-btn:hover {
+      background-color: #c82333;
     }
     form input, form textarea {
       width: 100%;
@@ -156,8 +168,21 @@
     form button {
       width: 100%;
     }
+    .user-approval {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .user-details {
+      flex: 1;
+    }
     footer {
-      background-color: #002D62;
+      background-color: #4D1979;
       color: white;
       text-align: center;
       padding: 1rem 0;
@@ -188,6 +213,13 @@
       .header-right {
         margin-top: 1rem;
       }
+      .user-approval {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .user-approval div {
+        margin-top: 1rem;
+      }
     }
   </style>
 </head>
@@ -199,6 +231,7 @@
         <ul>
           <li><a href="#" id="homeLink" class="active" onclick="showSection('timeline')">Home</a></li>
           <li><a href="#" id="contributeLink" onclick="showSection('contribute')">Contribute</a></li>
+          <li id="approvalsLink" style="display:none"><a href="#" onclick="showSection('approvals')">Approvals</a></li>
         </ul>
       </nav>
     </div>
@@ -228,6 +261,10 @@
       <p>To contribute to the website code and learn about GitHub, fork the repository, make your changes, and submit a pull request. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a> (replace with actual URL).</p>
       <p>To add events to the timeline, sign in and use the 'Add Event' form on the Home page.</p>
     </div>
+    <div id="approvals" style="display:none">
+      <h2>Pending Approvals</h2>
+      <div id="unapprovedUsers"></div>
+    </div>
   </main>
 
   <footer>
@@ -247,6 +284,7 @@
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let isAdmin = false;
 
     function showAuthModal() {
       document.getElementById('authModal').style.display = 'flex';
@@ -269,6 +307,8 @@
         document.getElementById('logoutButton').style.display = 'none';
         document.getElementById('eventForm').style.display = 'none';
         document.getElementById('signinButton').style.display = 'block';
+        document.getElementById('approvalsLink').style.display = 'none';
+        isAdmin = false;
       }
     }
 
@@ -276,7 +316,7 @@
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('event_start', { ascending: true });
+        .order('event_start', { ascending: true});
 
       const container = document.getElementById('events');
       container.innerHTML = '';
@@ -293,6 +333,62 @@
         `;
         container.appendChild(div);
       });
+    }
+
+    async function loadUnapprovedUsers() {
+      const { data, error } = await supabase
+        .from('unapproved_users_view')
+        .select('user_id, email, created_at');
+
+      const container = document.getElementById('unapprovedUsers');
+      container.innerHTML = '';
+
+      if (error) return console.error('Error loading unapproved users:', error);
+
+      if (data.length === 0) {
+        container.innerHTML = '<p>No users awaiting approval.</p>';
+        return;
+      }
+
+      data.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user-approval';
+        div.innerHTML = `
+          <div class="user-details">
+            <span><strong>Email:</strong> ${user.email}</span><br>
+            <span><strong>Registered:</strong> ${new Date(user.created_at).toLocaleDateString()}</span>
+          </div>
+          <div>
+            <button class="btn approve-btn" onclick="approveUser('${user.user_id}')">Approve</button>
+            <button class="btn reject-btn" onclick="rejectUser('${user.user_id}')">Reject</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function approveUser(userId) {
+      const { error: insertError } = await supabase
+        .from('approved_users')
+        .insert([{ user_id: userId, approved: true }]);
+
+      if (insertError) {
+        alert('Failed to approve user: ' + insertError.message);
+      } else {
+        loadUnapprovedUsers();
+      }
+    }
+
+    async function rejectUser(userId) {
+      const { error: insertError } = await supabase
+        .from('approved_users')
+        .insert([{ user_id: userId, approved: false }]);
+
+      if (insertError) {
+        alert('Failed to reject user: ' + insertError.message);
+      } else {
+        loadUnapprovedUsers();
+      }
     }
 
     document.getElementById('eventForm').addEventListener('submit', async (e) => {
@@ -320,20 +416,45 @@
     function showSection(section) {
       const timeline = document.getElementById('timeline');
       const contribute = document.getElementById('contribute');
+      const approvals = document.getElementById('approvals');
       const homeLink = document.getElementById('homeLink');
       const contributeLink = document.getElementById('contributeLink');
+      const approvalsLink = document.getElementById('approvalsLink');
 
       if (section === 'timeline') {
         timeline.style.display = 'block';
         contribute.style.display = 'none';
+        approvals.style.display = 'none';
         homeLink.classList.add('active');
         contributeLink.classList.remove('active');
+        approvalsLink.querySelector('a').classList.remove('active');
       } else if (section === 'contribute') {
         timeline.style.display = 'none';
         contribute.style.display = 'block';
+        approvals.style.display = 'none';
         homeLink.classList.remove('active');
         contributeLink.classList.add('active');
+        approvalsLink.querySelector('a').classList.remove('active');
+      } else if (section === 'approvals') {
+        timeline.style.display = 'none';
+        contribute.style.display = 'none';
+        approvals.style.display = 'block';
+        homeLink.classList.remove('active');
+        contributeLink.classList.remove('active');
+        approvalsLink.querySelector('a').classList.add('active');
+        loadUnapprovedUsers();
       }
+    }
+
+    async function checkAdminStatus(userId) {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (error || !data) return false;
+      return data.role === 'admin';
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
@@ -350,6 +471,11 @@
         document.getElementById('eventForm').style.display = 'block';
         document.getElementById('logoutButton').style.display = 'block';
         document.getElementById('signinButton').style.display = 'none';
+
+        isAdmin = await checkAdminStatus(session.user.id);
+        if (isAdmin) {
+          document.getElementById('approvalsLink').style.display = 'list-item';
+        }
       } else {
         document.getElementById('signinButton').style.display = 'block';
       }
