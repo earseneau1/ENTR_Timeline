@@ -333,14 +333,24 @@
         .order('event_start', { ascending: true });
       const container = document.getElementById('events');
       container.innerHTML = '';
-      if (error) return console.error('Error loading events:', error);
+      if (error) {
+        console.error('Error loading events:', error);
+        return;
+      }
       data.forEach(event => {
         const div = document.createElement('div');
         div.className = 'event';
         div.innerHTML = `
           <div class="event-title">${event.title} (${new Date(event.event_start).getFullYear()})</div>
           <div>${event.description}</div>
-          ${event.image_url ? `<img src="${event.image_url}" width="200" />` : ''}
+          ${event.image_url 
+            ? `<img 
+                 src="${event.image_url}" 
+                 alt="Image for ${event.title}" 
+                 style="max-width:100%;height:auto;margin-top:0.5rem;"
+                 onerror="this.style.display='none'"
+               />`
+            : ''}
         `;
         container.appendChild(div);
       });
@@ -352,7 +362,10 @@
         .select('user_id, email, created_at');
       const container = document.getElementById('unapprovedUsers');
       container.innerHTML = '';
-      if (error) return console.error('Error loading unapproved users:', error);
+      if (error) {
+        console.error('Error loading unapproved users:', error);
+        return;
+      }
       if (data.length === 0) {
         container.innerHTML = '<p>No users awaiting approval.</p>';
         return;
@@ -374,31 +387,31 @@
       });
     }
 
-    // Use UPDATE instead of INSERT to flip the approval flag
+    // Logging restored
     async function approveUser(id) {
-      const { error } = await supabase
+      console.log('Attempting to approve user:', id);
+      const { data, error } = await supabase
         .from('approved_users')
         .update({ approved: true })
         .eq('user_id', id);
-
+      console.log('approveUser response:', { data, error });
       if (error) {
         alert('Failed to approve user: ' + error.message);
-      } else {
-        loadUnapprovedUsers();
       }
+      loadUnapprovedUsers();
     }
 
     async function rejectUser(id) {
-      const { error } = await supabase
+      console.log('Attempting to reject user:', id);
+      const { data, error } = await supabase
         .from('approved_users')
         .update({ approved: false })
         .eq('user_id', id);
-
+      console.log('rejectUser response:', { data, error });
       if (error) {
         alert('Failed to reject user: ' + error.message);
-      } else {
-        loadUnapprovedUsers();
       }
+      loadUnapprovedUsers();
     }
 
     async function checkUserApproval(userId) {
@@ -411,11 +424,13 @@
     }
 
     async function checkAdminStatus(userId) {
-      const { data } = await supabase
+      console.log('Checking admin status for:', userId);
+      const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .single();
+      console.log('checkAdminStatus response:', { data, error });
       return data?.role === 'admin';
     }
 
@@ -430,13 +445,10 @@
     window.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
-      // Load events immediately
       await loadEvents();
 
       if (session) {
         const userId = session.user.id;
-
-        // Approval workflow
         const approved = await checkUserApproval(userId);
         if (approved) {
           document.getElementById('eventForm').style.display = 'block';
@@ -445,11 +457,9 @@
           msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
           msg.style.display = 'block';
         }
-
         document.getElementById('signinButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'block';
 
-        // Admin check
         if (await checkAdminStatus(userId)) {
           document.getElementById('approvalsLink').style.display = 'list-item';
         }
@@ -459,15 +469,14 @@
     document.getElementById('eventForm').addEventListener('submit', async e => {
       e.preventDefault();
       const { data: { user } } = await supabase.auth.getUser();
-      const newEvent = {
+      await supabase.from('events').insert([{
         title: document.getElementById('title').value,
         description: document.getElementById('description').value,
         event_start: document.getElementById('eventStart').value,
         event_end: document.getElementById('eventEnd').value || null,
         image_url: document.getElementById('imageUrl').value,
         user_id: user.id
-      };
-      await supabase.from('events').insert([newEvent]);
+      }]);
       await loadEvents();
       e.target.reset();
     });
