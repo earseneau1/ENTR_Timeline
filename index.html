@@ -221,6 +221,15 @@
         margin-top: 1rem;
       }
     }
+    /* --- Welcome Message --- */
+    #welcomeMessage {
+      display: none;
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #e9ecef;
+      border-radius: 4px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -246,6 +255,10 @@
   <main>
     <div id="timeline">
       <div id="events"></div>
+
+      <!-- Welcome message for unapproved users -->
+      <div id="welcomeMessage"></div>
+
       <h2>Add Event</h2>
       <form id="eventForm" style="display:none">
         <input type="text" id="title" placeholder="Event Title" required><br>
@@ -256,11 +269,13 @@
         <button type="submit" class="btn">Add Event</button>
       </form>
     </div>
+
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
-      <p>To contribute to the website code and learn about GitHub, fork the repository, make your changes, and submit a pull request. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a> (replace with actual URL).</p>
+      <p>To contribute to the website code and learn about GitHub, fork the repository, make your changes, and submit a pull request. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a>.</p>
       <p>To add events to the timeline, sign in and use the 'Add Event' form on the Home page.</p>
     </div>
+
     <div id="approvals" style="display:none">
       <h2>Pending Approvals</h2>
       <div id="unapprovedUsers"></div>
@@ -283,7 +298,6 @@
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
-    // A normal production site would never expose keys like this. However, this site is for educational purposes. The database has settings to protect against bad actors.  
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let isAdmin = false;
 
@@ -291,9 +305,7 @@
       document.getElementById('authModal').style.display = 'flex';
     }
 
-    // Updated login function with redirect instructions
-    // This part of the code is absolultey critical and cannot be deleted. It helps redirect the user from the login link in their email back to the right location on the website.   
-
+    // magic‐link login with redirect back to this page
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const { error } = await supabase.auth.signInWithOtp({
@@ -317,6 +329,7 @@
         document.getElementById('eventForm').style.display = 'none';
         document.getElementById('signinButton').style.display = 'block';
         document.getElementById('approvalsLink').style.display = 'none';
+        document.getElementById('welcomeMessage').style.display = 'none';
         isAdmin = false;
       }
     }
@@ -325,7 +338,7 @@
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('event_start', { ascending: true});
+        .order('event_start', { ascending: true });
 
       const container = document.getElementById('events');
       container.innerHTML = '';
@@ -377,51 +390,44 @@
     }
 
     async function approveUser(userId) {
-      const { error: insertError } = await supabase
+      const { error } = await supabase
         .from('approved_users')
         .insert([{ user_id: userId, approved: true }]);
-
-      if (insertError) {
-        alert('Failed to approve user: ' + insertError.message);
-      } else {
-        loadUnapprovedUsers();
-      }
+      if (error) alert('Failed to approve user: ' + error.message);
+      else loadUnapprovedUsers();
     }
 
     async function rejectUser(userId) {
-      const { error: insertError } = await supabase
+      const { error } = await supabase
         .from('approved_users')
         .insert([{ user_id: userId, approved: false }]);
-
-      if (insertError) {
-        alert('Failed to reject user: ' + insertError.message);
-      } else {
-        loadUnapprovedUsers();
-      }
+      if (error) alert('Failed to reject user: ' + error.message);
+      else loadUnapprovedUsers();
     }
 
-    document.getElementById('eventForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const description = document.getElementById('description').value;
-      const eventStart = document.getElementById('eventStart').value;
-      const eventEnd = document.getElementById('eventEnd').value;
-      const imageUrl = document.getElementById('imageUrl').value;
+    // Check if this user has been approved
+    async function checkUserApproval(userId) {
+      const { data, error } = await supabase
+        .from('approved_users')
+        .select('approved')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (error) return false;
+      return data && data.approved === true;
+    }
 
-      const user = (await supabase.auth.getUser()).data.user;
+    // Check if user is an admin
+    async function checkAdminStatus(userId) {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+      if (error || !data) return false;
+      return data.role === 'admin';
+    }
 
-      const { error } = await supabase.from('events').insert([
-        { title, description, event_start: eventStart, event_end: eventEnd || null, image_url: imageUrl, user_id: user.id }
-      ]);
-
-      if (error) {
-        alert('Failed to add event');
-      } else {
-        loadEvents();
-        e.target.reset();
-      }
-    });
-
+    // Show/hide sections
     function showSection(section) {
       const timeline = document.getElementById('timeline');
       const contribute = document.getElementById('contribute');
@@ -455,38 +461,64 @@
       }
     }
 
-    async function checkAdminStatus(userId) {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-
-      if (error || !data) return false;
-      return data.role === 'admin';
-    }
-
+    // DOM ready
     window.addEventListener('DOMContentLoaded', async () => {
+      // Handle magic-link redirect in URL
       if (window.location.hash.includes('access_token')) {
         const { error } = await supabase.auth.getSessionFromUrl();
         if (error) console.error('Session error:', error.message);
-        else window.history.replaceState({}, document.title, '/');
+        else window.history.replaceState({}, document.title, window.location.pathname);
       }
 
-      loadEvents();
+      // Load timeline events
+      await loadEvents();
 
-      const session = (await supabase.auth.getSession()).data.session;
+      // Check session
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        document.getElementById('eventForm').style.display = 'block';
+        // Determine approval status
+        const approved = await checkUserApproval(session.user.id);
+
+        if (approved) {
+          document.getElementById('eventForm').style.display = 'block';
+          document.getElementById('welcomeMessage').style.display = 'none';
+        } else {
+          document.getElementById('eventForm').style.display = 'none';
+          const msg = document.getElementById('welcomeMessage');
+          msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
+          msg.style.display = 'block';
+        }
+
+        // Show logout, hide sign-in
         document.getElementById('logoutButton').style.display = 'block';
         document.getElementById('signinButton').style.display = 'none';
 
+        // Show Approvals if admin
         isAdmin = await checkAdminStatus(session.user.id);
         if (isAdmin) {
           document.getElementById('approvalsLink').style.display = 'list-item';
         }
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('eventForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const eventStart = document.getElementById('eventStart').value;
+      const eventEnd = document.getElementById('eventEnd').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error } = await supabase.from('events').insert([
+        { title, description, event_start: eventStart, event_end: eventEnd || null, image_url: imageUrl, user_id: user.id }
+      ]);
+      if (error) {
+        alert('Failed to add event: ' + error.message);
       } else {
-        document.getElementById('signinButton').style.display = 'block';
+        await loadEvents();
+        e.target.reset();
       }
     });
   </script>
