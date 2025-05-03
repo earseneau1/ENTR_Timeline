@@ -6,17 +6,61 @@
   <title>Entrepreneurship Timeline</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f4f4; color: #333; }
-    header, footer { background-color: #003366; color: white; padding: 1rem; text-align: center; }
-    header h1, footer p { margin: 0; }
-    main { max-width: 900px; margin: auto; padding: 2rem 1rem; }
-    .event { background: white; border-left: 4px solid #0059b3; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .event-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
-    #authSection { margin-top: 2rem; padding: 1rem; border: 1px solid #ccc; background: #fff; }
-    #logoutButton { display: none; margin: 1rem 0; }
-    form input, form textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; margin-bottom: 1rem; }
-    form button { background-color: #003366; color: white; border: none; padding: 0.75rem 1rem; cursor: pointer; }
-    form button:hover { background-color: #0059b3; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #002D62;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .event {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .event-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    #authModal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .btn {
+      background-color: #002D62;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .btn:hover {
+      background-color: #004494;
+    }
   </style>
 </head>
 <body>
@@ -25,29 +69,36 @@
   </header>
 
   <main>
-    <div id="authSection">
-      <p><strong>Login to contribute:</strong></p>
-      <input type="email" id="loginEmail" placeholder="Enter your email" required />
-      <button onclick="login()">Send Magic Link</button>
-    </div>
+    <button class="btn" onclick="showAuthModal()">Sign In / Sign Up</button>
 
-    <button id="logoutButton" onclick="logout()">Log Out</button>
+    <div id="logoutButton" style="display:none">
+      <button class="btn" onclick="logout()">Log Out</button>
+    </div>
 
     <div id="events"></div>
 
     <h2>Add Event</h2>
     <form id="eventForm" style="display:none">
-      <input type="text" id="title" placeholder="Event Title" required>
-      <textarea id="description" placeholder="Event Description" required></textarea>
-      <input type="date" id="eventDate" required>
-      <input type="url" id="imageUrl" placeholder="Image URL">
-      <button type="submit">Add Event</button>
+      <input type="text" id="title" placeholder="Event Title" required><br><br>
+      <textarea id="description" placeholder="Event Description" required></textarea><br><br>
+      <input type="date" id="eventStart" required><br><br>
+      <input type="date" id="eventEnd"><br><br>
+      <input type="url" id="imageUrl" placeholder="Image URL"><br><br>
+      <button type="submit" class="btn">Add Event</button>
     </form>
   </main>
 
   <footer>
-    <p>&copy; 2025 TCU Entrepreneurship & Innovation Department</p>
+    © 2025 TCU Entrepreneurship & Innovation Department
   </footer>
+
+  <div id="authModal">
+    <div class="modal-content">
+      <p><strong>Enter your email to receive a magic link:</strong></p>
+      <input type="email" id="loginEmail" placeholder="you@example.com" required />
+      <button class="btn" onclick="login()">Send Magic Link</button>
+    </div>
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
@@ -58,18 +109,18 @@
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('event_date', { ascending: true });
-
-      if (error) return console.error('Error loading events:', error);
+        .order('event_start', { ascending: true });
 
       const container = document.getElementById('events');
       container.innerHTML = '';
+
+      if (error) return console.error('Error loading events:', error);
 
       data.forEach(event => {
         const div = document.createElement('div');
         div.className = 'event';
         div.innerHTML = `
-          <div class="event-title">${event.title} (${new Date(event.event_date).getFullYear()})</div>
+          <div class="event-title">${event.title} (${new Date(event.event_start).getFullYear()})</div>
           <div>${event.description}</div>
           ${event.image_url ? `<img src="${event.image_url}" width="200" />` : ''}
         `;
@@ -77,63 +128,55 @@
       });
     }
 
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Check your email for the magic login link.');
+        document.getElementById('authModal').style.display = 'none';
+      }
+    }
+
+    function showAuthModal() {
+      document.getElementById('authModal').style.display = 'flex';
+    }
+
+    async function logout() {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('eventForm').style.display = 'none';
+      }
+    }
+
     document.getElementById('eventForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('title').value;
       const description = document.getElementById('description').value;
-      const eventDate = document.getElementById('eventDate').value;
+      const eventStart = document.getElementById('eventStart').value;
+      const eventEnd = document.getElementById('eventEnd').value;
       const imageUrl = document.getElementById('imageUrl').value;
 
       const user = (await supabase.auth.getUser()).data.user;
 
-      const { data, error } = await supabase.from('events').insert([
-        { title, description, event_date: eventDate, image_url: imageUrl, user_id: user.id }
+      const { error } = await supabase.from('events').insert([
+        { title, description, event_start: eventStart, event_end: eventEnd || null, image_url: imageUrl, user_id: user.id }
       ]);
 
       if (error) {
         alert('Failed to add event');
-        console.error(error);
       } else {
         loadEvents();
         e.target.reset();
       }
     });
 
-    async function login() {
-      const email = document.getElementById('loginEmail').value;
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: 'https://earseneau1.github.io/ENTR_20263/'
-        }
-      });
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
-        alert('Check your email for the magic login link.');
-      }
-    }
-
-    async function logout() {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        alert('Logout error: ' + error.message);
-      } else {
-        document.getElementById('logoutButton').style.display = 'none';
-        document.getElementById('eventForm').style.display = 'none';
-        document.getElementById('authSection').style.display = 'block';
-      }
-    }
-
     supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         document.getElementById('eventForm').style.display = 'block';
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'inline-block';
-      } else {
-        document.getElementById('eventForm').style.display = 'none';
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'block';
       }
     });
 
