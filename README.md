@@ -1,9 +1,5 @@
 # Entrepreneurship History Timeline
 
-**Course**: ENTR 20263 Entrepreneurship & Innovation (TCU Neeley School of Business)
-
-**Audience**: Required for all TCU business majors
-
 ## Overview
 
 This web‑based timeline tool was developed for ENTR 20263: Entrepreneurship & Innovation. The primary learning objective is to introduce students to modern, AI‑assisted software workflows, not to delve into advanced programming techniques. Through guided interaction with the codebase—and by leveraging generative AI—students will:
