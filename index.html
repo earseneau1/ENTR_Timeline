@@ -255,10 +255,7 @@
   <main>
     <div id="timeline">
       <div id="events"></div>
-
-      <!-- Welcome message for unapproved users -->
       <div id="welcomeMessage"></div>
-
       <h2>Add Event</h2>
       <form id="eventForm" style="display:none">
         <input type="text" id="title" placeholder="Event Title" required><br>
@@ -272,8 +269,8 @@
 
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
-      <p>To contribute to the website code and learn about GitHub, fork the repository, make your changes, and submit a pull request. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a>.</p>
-      <p>To add events to the timeline, sign in and use the 'Add Event' form on the Home page.</p>
+      <p>Fork the repo, make changes, and submit a PR. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a>.</p>
+      <p>Once approved, you can add events via the form on Home.</p>
     </div>
 
     <div id="approvals" style="display:none">
@@ -300,12 +297,10 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Show the auth modal
     function showAuthModal() {
       document.getElementById('authModal').style.display = 'flex';
     }
 
-    // Send magic link with redirect back
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const { error } = await supabase.auth.signInWithOtp({
@@ -322,7 +317,6 @@
       }
     }
 
-    // Log out user
     async function logout() {
       await supabase.auth.signOut();
       document.getElementById('logoutButton').style.display = 'none';
@@ -332,7 +326,6 @@
       document.getElementById('welcomeMessage').style.display = 'none';
     }
 
-    // Load timeline events
     async function loadEvents() {
       const { data, error } = await supabase
         .from('events')
@@ -353,7 +346,6 @@
       });
     }
 
-    // Load pending approvals
     async function loadUnapprovedUsers() {
       const { data, error } = await supabase
         .from('unapproved_users_view')
@@ -382,7 +374,6 @@
       });
     }
 
-    // Approve or reject user
     async function approveUser(id) {
       await supabase.from('approved_users').insert([{ user_id: id, approved: true }]);
       loadUnapprovedUsers();
@@ -392,7 +383,6 @@
       loadUnapprovedUsers();
     }
 
-    // Check approval or admin status
     async function checkUserApproval(userId) {
       const { data } = await supabase
         .from('approved_users')
@@ -401,6 +391,7 @@
         .maybeSingle();
       return data?.approved === true;
     }
+
     async function checkAdminStatus(userId) {
       const { data } = await supabase
         .from('user_roles')
@@ -410,32 +401,26 @@
       return data?.role === 'admin';
     }
 
-    // Show/hide sections
     function showSection(sec) {
       ['timeline','contribute','approvals'].forEach(s => {
         document.getElementById(s).style.display = s === sec ? 'block' : 'none';
-        document.getElementById(s+'Link')?.classList.toggle('active', s===sec);
+        document.getElementById(s + 'Link')?.classList.toggle('active', s === sec);
       });
-      if (sec==='approvals') loadUnapprovedUsers();
+      if (sec === 'approvals') loadUnapprovedUsers();
     }
 
-    // Initialization
     window.addEventListener('DOMContentLoaded', async () => {
-      // 1) Handle magic-link redirect first
-      if (window.location.hash.includes('access_token')) {
-        await supabase.auth.getSessionFromUrl();
-        window.history.replaceState({}, document.title, window.location.pathname);
-        window.location.reload();
-        return;
-      }
+      // 1) Retrieve session (SDK auto–parses URL)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) console.error('Error getting session:', sessionError.message);
 
-      // 2) Load events immediately
+      // 2) Populate timeline
       await loadEvents();
 
-      // 3) Check session, approval, admin
-      const { data: { session } } = await supabase.auth.getSession();
+      // 3) If signed in, run approval + admin logic
       if (session) {
-        const approved = await checkUserApproval(session.user.id);
+        const userId = session.user.id;
+        const approved = await checkUserApproval(userId);
         if (approved) {
           document.getElementById('eventForm').style.display = 'block';
           document.getElementById('welcomeMessage').style.display = 'none';
@@ -444,29 +429,26 @@
           msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
           msg.style.display = 'block';
         }
-
         document.getElementById('signinButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'block';
-
-        if (await checkAdminStatus(session.user.id)) {
+        if (await checkAdminStatus(userId)) {
           document.getElementById('approvalsLink').style.display = 'list-item';
         }
       }
     });
 
-    // Handle event form submit
     document.getElementById('eventForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const u = await supabase.auth.getUser();
-      const evt = {
+      const { data: { user } } = await supabase.auth.getUser();
+      const newEvent = {
         title: document.getElementById('title').value,
         description: document.getElementById('description').value,
         event_start: document.getElementById('eventStart').value,
         event_end: document.getElementById('eventEnd').value || null,
         image_url: document.getElementById('imageUrl').value,
-        user_id: u.data.user.id
+        user_id: user.id
       };
-      await supabase.from('events').insert([evt]);
+      await supabase.from('events').insert([newEvent]);
       await loadEvents();
       e.target.reset();
     });
