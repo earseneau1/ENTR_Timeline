@@ -144,7 +144,7 @@
       transition: background-color 0.3s;
     }
     .btn:hover {
-      background-color: #3d144f; /* Darker shade of purple for hover */
+      background-color: #3d144f;
     }
     .approve-btn {
       background-color: #28a745;
@@ -283,6 +283,7 @@
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
+    // A normal production site would never expose keys like this. However, this site is for educational purposes. The database has settings to protect against bad actors.  
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let isAdmin = false;
 
@@ -290,9 +291,17 @@
       document.getElementById('authModal').style.display = 'flex';
     }
 
+    // Updated login function with redirect instructions
+    // This part of the code is absolultey critical and cannot be deleted. It helps redirect the user from the login link in their email back to the right location on the website.   
+
     async function login() {
       const email = document.getElementById('loginEmail').value;
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin + window.location.pathname
+        }
+      });
       if (error) {
         alert('Login error: ' + error.message);
       } else {
