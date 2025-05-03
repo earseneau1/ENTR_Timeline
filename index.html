@@ -87,7 +87,12 @@
 
     async function login() {
       const email = document.getElementById('loginEmail').value;
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: 'https://earseneau1.github.io/ENTR_20263/'
+        }
+      });
       if (error) {
         alert('Login error: ' + error.message);
       } else {
