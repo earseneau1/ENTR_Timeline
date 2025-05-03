@@ -1,6 +1,7 @@
 # Entrepreneurship History Timeline
 
-**Course**: ENTR 20263 Entrepreneurship & Innovation (TCU Neeley School of Business)**Audience**: Required for all TCU business majors
+**Course**: ENTR 20263 Entrepreneurship & Innovation (TCU Neeley School of Business)
+**Audience**: Required for all TCU business majors
 
 ## Overview
 
