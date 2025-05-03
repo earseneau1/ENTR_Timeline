@@ -12,16 +12,69 @@
       margin: 0;
       padding: 0;
     }
-    header, footer {
-      background-color: #002D62;
+    header {
+      background-color: rgba(0, 45, 98, 0.8);
       color: white;
-      text-align: center;
-      padding: 1rem 0;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    .header-left h1 {
+      margin: 0 2rem 0 0;
+      font-size: 1.5rem;
+    }
+    .header-left nav ul {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .header-left nav ul li {
+      margin-right: 1rem;
+    }
+    .header-left nav ul li a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .header-left nav ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .header-left nav ul li a.active {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
     }
     main {
       max-width: 900px;
       margin: 2rem auto;
       padding: 1rem;
+      padding-bottom: 5rem; /* Space for fixed footer */
+    }
+    #events {
+      position: relative;
+      padding-left: 2rem;
+    }
+    #events::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #ccc;
     }
     .event {
       background: white;
@@ -29,6 +82,26 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       padding: 1rem;
       margin-bottom: 1.5rem;
+      position: relative;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: fadeIn 0.5s forwards;
+    }
+    .event::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background-color: #002D62;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
     .event-title {
       font-weight: bold;
@@ -38,8 +111,10 @@
       display: none;
       position: fixed;
       z-index: 9999;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.5);
       justify-content: center;
       align-items: center;
@@ -49,6 +124,15 @@
       padding: 2rem;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      width: 300px;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     .btn {
       background-color: #002D62;
@@ -57,35 +141,93 @@
       padding: 0.5rem 1rem;
       cursor: pointer;
       border-radius: 4px;
+      transition: background-color 0.3s;
     }
     .btn:hover {
       background-color: #004494;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      width: 100%;
+    }
+    footer {
+      background-color: #002D62;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 0.5rem;
+      }
+      .header-left {
+        flex-direction: column;
+        align-items: center;
+      }
+      .header-left h1 {
+        margin-bottom: 0.5rem;
+      }
+      .header-left nav ul {
+        flex-direction: column;
+      }
+      .header-left nav ul li {
+        margin-bottom: 0.5rem;
+      }
+      .header-right {
+        margin-top: 1rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Entrepreneurship History Timeline</h1>
+    <div class="header-left">
+      <h1>Entrepreneurship History Timeline</h1>
+      <nav>
+        <ul>
+          <li><a href="#" id="homeLink" class="active" onclick="showSection('timeline')">Home</a></li>
+          <li><a href="#" id="contributeLink" onclick="showSection('contribute')">Contribute</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="header-right">
+      <button id="signinButton" class="btn" onclick="showAuthModal()">Sign In / Sign Up</button>
+      <div id="logoutButton" style="display:none">
+        <button class="btn" onclick="logout()">Log Out</button>
+      </div>
+    </div>
   </header>
 
   <main>
-    <button class="btn" onclick="showAuthModal()">Sign In / Sign Up</button>
-
-    <div id="logoutButton" style="display:none">
-      <button class="btn" onclick="logout()">Log Out</button>
+    <div id="timeline">
+      <div id="events"></div>
+      <h2>Add Event</h2>
+      <form id="eventForm" style="display:none">
+        <input type="text" id="title" placeholder="Event Title" required><br>
+        <textarea id="description" placeholder="Event Description" required></textarea><br>
+        <input type="date" id="eventStart" required><br>
+        <input type="date" id="eventEnd"><br>
+        <input type="url" id="imageUrl" placeholder="Image URL"><br>
+        <button type="submit" class="btn">Add Event</button>
+      </form>
     </div>
-
-    <div id="events"></div>
-
-    <h2>Add Event</h2>
-    <form id="eventForm" style="display:none">
-      <input type="text" id="title" placeholder="Event Title" required><br><br>
-      <textarea id="description" placeholder="Event Description" required></textarea><br><br>
-      <input type="date" id="eventStart" required><br><br>
-      <input type="date" id="eventEnd"><br><br>
-      <input type="url" id="imageUrl" placeholder="Image URL"><br><br>
-      <button type="submit" class="btn">Add Event</button>
-    </form>
+    <div id="contribute" style="display:none">
+      <h2>Contribute</h2>
+      <p>To contribute to the website code and learn about GitHub, fork the repository, make your changes, and submit a pull request. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a> (replace with actual URL).</p>
+      <p>To add events to the timeline, sign in and use the 'Add Event' form on the Home page.</p>
+    </div>
   </main>
 
   <footer>
@@ -94,6 +236,7 @@
 
   <div id="authModal">
     <div class="modal-content">
+      <span onclick="document.getElementById('authModal').style.display='none'" style="float:right; cursor:pointer;">×</span>
       <p><strong>Enter your email to receive a magic link:</strong></p>
       <input type="email" id="loginEmail" placeholder="you@example.com" required />
       <button class="btn" onclick="login()">Send Magic Link</button>
@@ -104,6 +247,30 @@
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function showAuthModal() {
+      document.getElementById('authModal').style.display = 'flex';
+    }
+
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Check your email for the magic login link.');
+        document.getElementById('authModal').style.display = 'none';
+      }
+    }
+
+    async function logout() {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('eventForm').style.display = 'none';
+        document.getElementById('signinButton').style.display = 'block';
+      }
+    }
 
     async function loadEvents() {
       const { data, error } = await supabase
@@ -128,29 +295,6 @@
       });
     }
 
-    async function login() {
-      const email = document.getElementById('loginEmail').value;
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
-        alert('Check your email for the magic login link.');
-        document.getElementById('authModal').style.display = 'none';
-      }
-    }
-
-    function showAuthModal() {
-      document.getElementById('authModal').style.display = 'flex';
-    }
-
-    async function logout() {
-      const { error } = await supabase.auth.signOut();
-      if (!error) {
-        document.getElementById('logoutButton').style.display = 'none';
-        document.getElementById('eventForm').style.display = 'none';
-      }
-    }
-
     document.getElementById('eventForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('title').value;
@@ -173,14 +317,43 @@
       }
     });
 
-    supabase.auth.onAuthStateChange((event, session) => {
+    function showSection(section) {
+      const timeline = document.getElementById('timeline');
+      const contribute = document.getElementById('contribute');
+      const homeLink = document.getElementById('homeLink');
+      const contributeLink = document.getElementById('contributeLink');
+
+      if (section === 'timeline') {
+        timeline.style.display = 'block';
+        contribute.style.display = 'none';
+        homeLink.classList.add('active');
+        contributeLink.classList.remove('active');
+      } else if (section === 'contribute') {
+        timeline.style.display = 'none';
+        contribute.style.display = 'block';
+        homeLink.classList.remove('active');
+        contributeLink.classList.add('active');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (window.location.hash.includes('access_token')) {
+        const { error } = await supabase.auth.getSessionFromUrl();
+        if (error) console.error('Session error:', error.message);
+        else window.history.replaceState({}, document.title, '/');
+      }
+
+      loadEvents();
+
+      const session = (await supabase.auth.getSession()).data.session;
       if (session) {
         document.getElementById('eventForm').style.display = 'block';
         document.getElementById('logoutButton').style.display = 'block';
+        document.getElementById('signinButton').style.display = 'none';
+      } else {
+        document.getElementById('signinButton').style.display = 'block';
       }
     });
-
-    loadEvents();
   </script>
 </body>
 </html>
