@@ -269,7 +269,7 @@
 
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
-      <p>Fork the repo, make changes, and submit a PR. Visit the <a href="https://github.com/your-repo" target="_blank">GitHub Repo</a>.</p>
+      <p>Fork the repo, make changes, and submit a PR. Visit the <a href="https://github.com/earseneau1/ENTR_20263" target="_blank">GitHub Repo</a>.</p>
       <p>Once approved, you can add events via the form on Home.</p>
     </div>
 
@@ -382,7 +382,6 @@
         .eq('user_id', id);
 
       if (error) {
-        console.error('Approve error:', error);
         alert('Failed to approve user: ' + error.message);
       } else {
         loadUnapprovedUsers();
@@ -396,7 +395,6 @@
         .eq('user_id', id);
 
       if (error) {
-        console.error('Reject error:', error);
         alert('Failed to reject user: ' + error.message);
       } else {
         loadUnapprovedUsers();
@@ -413,7 +411,7 @@
     }
 
     async function checkAdminStatus(userId) {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
