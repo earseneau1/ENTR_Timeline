@@ -4,34 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Entrepreneurship Timeline</title>
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-pIVpPzIulGvpIhBJtgflTdVx3FX2FhaIOq0lsl+AADE5Cm6+yak5IyVbhtdB8+38EVpHgnD7XNEb5lc10/3pTA=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-
-  <!-- Explicit UMD bundle to ensure compatibility -->
+  <!-- Supabase client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <!-- Font Awesome CDN (no integrity attribute) -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous" />
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f9;
-      margin: 0;
-      padding: 0;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
     header {
-      background-color: rgba(77, 25, 121, 0.8);
+      background-color: rgba(77,25,121,0.8);
       color: white;
       padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
+      position: sticky; top: 0;
       z-index: 1000;
     }
     .header-left { display: flex; align-items: center; }
@@ -39,168 +27,102 @@
     .header-left nav ul { display: flex; list-style: none; padding: 0; margin: 0; }
     .header-left nav ul li { margin-right: 1rem; }
     .header-left nav ul li a {
-      color: white;
-      text-decoration: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
+      color: white; text-decoration: none;
+      padding: 0.5rem 1rem; border-radius: 4px;
       transition: background-color 0.3s;
     }
     .header-left nav ul li a:hover { background-color: rgba(255,255,255,0.2); }
     .header-left nav ul li a.active { background-color: rgba(255,255,255,0.3); }
     .header-right { display: flex; align-items: center; }
-
     main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 1rem;
-      padding-bottom: 5rem;
+      max-width: 900px; margin: 2rem auto;
+      padding: 1rem; padding-bottom: 5rem;
     }
-
     #events {
-      position: relative;
-      padding-left: 2rem;
+      position: relative; padding-left: 2rem;
     }
     #events::before {
-      content: '';
-      position: absolute;
-      left: 1rem;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background-color: #ccc;
+      content: ''; position: absolute;
+      left: 1rem; top: 0; bottom: 0;
+      width: 2px; background-color: #ccc;
     }
-
     .event {
-      background: white;
-      border-radius: 6px;
+      background: white; border-radius: 6px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-      opacity: 0;
+      padding: 1rem; margin-bottom: 1.5rem;
+      position: relative; opacity: 0;
       transform: translateX(-20px);
       animation: fadeIn 0.5s forwards;
     }
     .event::before {
-      content: '';
-      position: absolute;
-      left: -1.5rem;
-      top: 0.5rem;
-      width: 1rem;
-      height: 1rem;
-      border-radius: 50%;
-      background-color: #4D1979;
+      content: ''; position: absolute;
+      left: -1.5rem; top: 0.5rem;
+      width: 1rem; height: 1rem;
+      border-radius: 50%; background-color: #4D1979;
     }
     @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      to { opacity:1; transform: translateX(0); }
     }
     .event-title { font-weight: bold; font-size: 1.2rem; }
 
-    /* generic modal overlay */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
+    .modal, #authModal {
+      display: none; position: fixed;
+      left:0; top:0; width:100%; height:100%;
       background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
+      justify-content: center; align-items: center;
     }
-    /* magic-link modal must float above everything */
-    #authModal {
-      display: none;
-      position: fixed;
-      z-index: 10000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
+    .modal { z-index: 9999; }
+    #authModal { z-index: 10000; }
 
     .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      width: 300px;
-      text-align: center;
+      background: white; padding:2rem;
+      border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3);
+      width:300px; text-align:center;
       position: relative;
     }
     .modal-content input,
     .modal-content textarea {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width:100%; padding:0.5rem;
+      margin-bottom:1rem; border:1px solid #ccc;
+      border-radius:4px;
     }
-
     .btn {
-      background-color: #4D1979;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      border-radius: 4px;
+      background-color:#4D1979; color:white;
+      border:none; padding:0.5rem 1rem;
+      cursor:pointer; border-radius:4px;
       transition: background-color 0.3s;
     }
-    .btn:hover { background-color: #3d144f; }
-
-    .approve-btn { background-color: #28a745; }
-    .approve-btn:hover { background-color: #218838; }
-    .reject-btn { background-color: #dc3545; }
-    .reject-btn:hover { background-color: #c82333; }
-
+    .btn:hover { background-color:#3d144f; }
+    .approve-btn { background-color:#28a745; }
+    .approve-btn:hover { background-color:#218838; }
+    .reject-btn { background-color:#dc3545; }
+    .reject-btn:hover { background-color:#c82333; }
     .user-approval {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin-bottom: 1rem;
+      display:flex; justify-content:space-between; align-items:center;
+      background:white; border-radius:6px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+      padding:1rem; margin-bottom:1rem;
     }
-
     footer {
-      background-color: #4D1979;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
+      background-color:#4D1979; color:white;
+      text-align:center; padding:1rem 0;
+      position:fixed; bottom:0; left:0; right:0;
+      z-index:1000;
     }
-
-    @media (max-width: 768px) {
-      header { flex-direction: column; padding: 0.5rem; }
-      .header-left { flex-direction: column; align-items: center; }
-      .header-left h1 { margin-bottom: 0.5rem; }
-      .header-left nav ul { flex-direction: column; }
-      .header-left nav ul li { margin-bottom: 1rem; }
-      .header-right { margin-top: 1rem; }
-      .user-approval { flex-direction: column; align-items: flex-start; }
-      .user-approval div { margin-top: 1rem; }
+    @media(max-width:768px) {
+      header { flex-direction:column; padding:0.5rem; }
+      .header-left { flex-direction:column; align-items:center; }
+      .header-left h1 { margin-bottom:0.5rem; }
+      .header-left nav ul { flex-direction:column; }
+      .header-left nav ul li { margin-bottom:1rem; }
+      .header-right { margin-top:1rem; }
+      .user-approval { flex-direction:column; align-items:flex-start; }
+      .user-approval div { margin-top:1rem; }
     }
-
     #welcomeMessage {
-      display: none;
-      margin: 1rem 0;
-      padding: 1rem;
-      background: #e9ecef;
-      border-radius: 4px;
-      color: #333;
+      display:none; margin:1rem 0;
+      padding:1rem; background:#e9ecef;
+      border-radius:4px; color:#333;
     }
   </style>
 </head>
@@ -210,14 +132,19 @@
       <h1>Entrepreneurship History Timeline</h1>
       <nav>
         <ul>
-          <li><a href="#" id="homeLink" class="active" onclick="showSection('timeline')">Home</a></li>
-          <li><a href="#" id="contributeLink" onclick="showSection('contribute')">Contribute</a></li>
-          <li id="approvalsLink" style="display:none"><a href="#" onclick="showSection('approvals')">Approvals</a></li>
+          <li><a href="#" id="homeLink" class="active"
+                 onclick="showSection('timeline')">Home</a></li>
+          <li><a href="#" id="contributeLink"
+                 onclick="showSection('contribute')">Contribute</a></li>
+          <li id="approvalsLink" style="display:none">
+            <a href="#" onclick="showSection('approvals')">Approvals</a>
+          </li>
         </ul>
       </nav>
     </div>
     <div class="header-right">
-      <button id="signinButton" class="btn" onclick="showAuthModal()">Sign In / Sign Up</button>
+      <button id="signinButton" class="btn"
+              onclick="showAuthModal()">Sign In / Sign Up</button>
       <div id="logoutButton" style="display:none">
         <button class="btn" onclick="logout()">Log Out</button>
       </div>
@@ -235,7 +162,9 @@
 
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
-      <p>Fork the repo, make changes, and submit a PR. Visit the <a href="https://github.com/earseneau1/ENTR_20263" target="_blank">GitHub Repo</a>.</p>
+      <p>Fork the repo, make changes, and submit a PR. Visit the
+         <a href="https://github.com/earseneau1/ENTR_20263"
+            target="_blank" rel="noopener">GitHub Repo</a>.</p>
       <p>Once approved, you can add events via the form on Home.</p>
     </div>
 
@@ -247,30 +176,35 @@
 
   <footer>© 2025 TCU Entrepreneurship & Innovation Department</footer>
 
-  <!-- Magic‑link popup -->
-  <div id="authModal">
+  <!-- Magic-link popup -->
+  <div id="authModal" class="modal">
     <div class="modal-content">
-      <span onclick="document.getElementById('authModal').style.display='none'" 
-            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
+      <span onclick="document.getElementById('authModal').style.display='none'"
+            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;
+                   font-size:1.2rem;">×</span>
       <p><strong>Enter your email to receive a magic link:</strong></p>
       <input type="email" id="loginEmail" placeholder="you@example.com" required />
       <button class="btn" onclick="login()">Send Magic Link</button>
     </div>
   </div>
 
-  <!-- Event popup (add/edit) -->
+  <!-- Add/Edit Event popup -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
-      <span id="closeEventModal" 
-            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
+      <span id="closeEventModal"
+            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;
+                   font-size:1.2rem;">×</span>
       <h3 id="modalTitle">Add Event</h3>
       <form id="eventModalForm">
         <input type="hidden" id="eventId">
-        <input type="text" id="modalTitleInput" placeholder="Event Title" required>
-        <textarea id="modalDescription" placeholder="Event Description" required></textarea>
+        <input type="text" id="modalTitleInput"
+               placeholder="Event Title" required>
+        <textarea id="modalDescription"
+                  placeholder="Event Description" required></textarea>
         <input type="date" id="modalStart" required>
         <input type="date" id="modalEnd">
-        <input type="url" id="modalImageUrl" placeholder="Image URL">
+        <input type="url" id="modalImageUrl"
+               placeholder="Image URL">
         <button type="submit" class="btn" id="saveEventBtn">Save</button>
       </form>
     </div>
@@ -278,24 +212,73 @@
 
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.'
+      + 'eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJt'
+      + 'YXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1'
+      + 'MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.'
+      + 'SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
+    const supabase = window.supabase
+      .createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('signinButton')
+              .addEventListener('click', showAuthModal);
+      document.getElementById('closeEventModal')
+              .addEventListener('click', () =>
+                document.getElementById('eventModal')
+                        .style.display = 'none');
+      document.getElementById('addEventBtn')
+              .addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Add Event';
+        document.getElementById('eventModalForm').reset();
+        document.getElementById('eventId').value = '';
+        document.getElementById('eventModal').style.display = 'flex';
+      });
+      document.getElementById('eventModalForm')
+              .addEventListener('submit', handleEventForm);
+      document.getElementById('eventForm')
+              .addEventListener('submit', handleQuickAdd);
+      init();
+    });
+
+    async function init() {
+      await loadEvents();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const uid = session.user.id;
+        if (await checkUserApproval(uid)) {
+          document.getElementById('eventForm').style.display = 'block';
+        } else {
+          const m = document.getElementById('welcomeMessage');
+          m.textContent = 'Thanks for signing in! Once approved, you can add events.';
+          m.style.display = 'block';
+        }
+        document.getElementById('signinButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'block';
+        if (await checkAdminStatus(uid)) {
+          document.getElementById('approvalsLink').style.display = 'list-item';
+        }
+      }
+    }
 
     function showAuthModal() {
       document.getElementById('authModal').style.display = 'flex';
     }
+
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+        options: { emailRedirectTo: window.location.href }
       });
-      if (error) alert('Login error: ' + error.message);
-      else {
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
         alert('Check your email for the magic login link.');
         document.getElementById('authModal').style.display = 'none';
       }
     }
+
     async function logout() {
       await supabase.auth.signOut();
       document.getElementById('logoutButton').style.display = 'none';
@@ -305,158 +288,154 @@
     }
 
     async function loadEvents() {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const currentUserId = sessionData?.session?.user?.id;
+      const { data: { session } } = await supabase.auth.getSession();
+      const uid = session?.user?.id;
       const { data, error } = await supabase
-        .from('events').select('*').order('event_start', { ascending: true });
+        .from('events')
+        .select('*')
+        .order('event_start', { ascending: true });
+      if (error) return console.error(error);
       const container = document.getElementById('events');
       container.innerHTML = '';
-      if (error) return console.error(error);
-
       data.forEach(evt => {
         const div = document.createElement('div');
         div.className = 'event';
-        let controls = '';
-        if (currentUserId === evt.user_id) {
-          controls = `
-            <span style="position:absolute; top:0.5rem; right:2.5rem; cursor:pointer;" onclick="onEdit('${evt.id}')">
-              <i class="fas fa-pencil-alt"></i>
-            </span>
-            <span style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;" onclick="onDelete('${evt.id}')">
-              <i class="fas fa-trash"></i>
-            </span>
-          `;
+        let ctrls = '';
+        if (uid === evt.user_id) {
+          ctrls = `<span onclick="onEdit('${evt.id}')"
+                        style="position:absolute;top:0.5rem;right:2.5rem;cursor:pointer;">
+                     🖉
+                   </span>` +
+                  `<span onclick="onDelete('${evt.id}')"
+                        style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;">
+                     🗑️
+                   </span>`;
         }
         div.innerHTML = `
-          <div class="event-title">${evt.title} (${new Date(evt.event_start).getFullYear()})</div>
+          <div class="event-title">
+            ${evt.title} (${new Date(evt.event_start).getFullYear()})
+          </div>
           <div>${evt.description}</div>
-          ${evt.image_url ? `<img src="${evt.image_url}" style="max-width:100%;margin-top:0.5rem;" onerror="this.style.display='none'"/>` : ''}
-          ${controls}
+          ${evt.image_url
+             ? `<img src="${evt.image_url}"
+                      style="max-width:100%;margin-top:0.5rem;"
+                      onerror="this.style.display='none'"/>`
+             : ''}
+          ${ctrls}
         `;
         container.appendChild(div);
       });
     }
 
-    window.onEdit = async function(id) {
-      const { data: [evt] } = await supabase.from('events').select('*').eq('id', id);
-      document.getElementById('eventId').value = evt.id;
-      document.getElementById('modalTitleInput').value = evt.title;
-      document.getElementById('modalDescription').value = evt.description;
-      document.getElementById('modalStart').value = evt.event_start.split('T')[0];
-      document.getElementById('modalEnd').value = evt.event_end?.split('T')[0] || '';
-      document.getElementById('modalImageUrl').value = evt.image_url || '';
-      document.getElementById('modalTitle').textContent = 'Edit Event';
+    async function handleEventForm(e) {
+      e.preventDefault();
+      const id  = document.getElementById('eventId').value;
+      const pay = {
+        title:       document.getElementById('modalTitleInput').value,
+        description: document.getElementById('modalDescription').value,
+        event_start: document.getElementById('modalStart').value,
+        event_end:   document.getElementById('modalEnd').value || null,
+        image_url:   document.getElementById('modalImageUrl').value
+      };
+      if (id) {
+        await supabase.from('events').update(pay).eq('id', id);
+      } else {
+        const { data:{user} } = await supabase.auth.getUser();
+        pay.user_id = user.id;
+        await supabase.from('events').insert([pay]);
+      }
+      document.getElementById('eventModal').style.display = 'none';
+      await loadEvents();
+    }
+
+    async function handleQuickAdd(e) {
+      e.preventDefault();
+      const { data:{user} } = await supabase.auth.getUser();
+      await supabase.from('events').insert([{
+        title:       document.getElementById('title').value,
+        description: document.getElementById('description').value,
+        event_start: document.getElementById('eventStart').value,
+        event_end:   document.getElementById('eventEnd').value || null,
+        image_url:   document.getElementById('imageUrl').value,
+        user_id:     user.id
+      }]);
+      await loadEvents();
+      e.target.reset();
+    }
+
+    window.onEdit = async id => {
+      const { data:[evt] } = await supabase.from('events')
+        .select('*').eq('id', id);
+      document.getElementById('eventId').value            = evt.id;
+      document.getElementById('modalTitleInput').value    = evt.title;
+      document.getElementById('modalDescription').value   = evt.description;
+      document.getElementById('modalStart').value         = evt.event_start.split('T')[0];
+      document.getElementById('modalEnd').value           = evt.event_end?.split('T')[0] || '';
+      document.getElementById('modalImageUrl').value      = evt.image_url || '';
+      document.getElementById('modalTitle').textContent   = 'Edit Event';
       document.getElementById('eventModal').style.display = 'flex';
     };
 
-    window.onDelete = function(id) {
+    window.onDelete = id => {
       if (confirm('Are you sure you want to delete this event?')) {
         supabase.from('events').delete().eq('id', id).then(loadEvents);
       }
     };
 
-    document.getElementById('addEventBtn').addEventListener('click', () => {
-      document.getElementById('modalTitle').textContent = 'Add Event';
-      document.getElementById('eventModalForm').reset();
-      document.getElementById('eventId').value = '';
-      document.getElementById('eventModal').style.display = 'flex';
-    });
-    document.getElementById('closeEventModal').addEventListener('click', () => {
-      document.getElementById('eventModal').style.display = 'none';
-    });
-
-    document.getElementById('eventModalForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const id = document.getElementById('eventId').value;
-      const payload = {
-        title: document.getElementById('modalTitleInput').value,
-        description: document.getElementById('modalDescription').value,
-        event_start: document.getElementById('modalStart').value,
-        event_end: document.getElementById('modalEnd').value || null,
-        image_url: document.getElementById('modalImageUrl').value
-      };
-      if (id) await supabase.from('events').update(payload).eq('id', id);
-      else {
-        const { data: { user } } = await supabase.auth.getUser();
-        payload.user_id = user.id;
-        await supabase.from('events').insert([payload]);
-      }
-      document.getElementById('eventModal').style.display = 'none';
-      loadEvents();
-    });
-
     async function loadUnapprovedUsers() {
-      const { data, error } = await supabase.from('unapproved_users_view').select('user_id,email,created_at');
-      const container = document.getElementById('unapprovedUsers');
-      container.innerHTML = '';
+      const { data, error } = await supabase
+        .from('unapproved_users_view')
+        .select('user_id,email,created_at');
       if (error) return console.error(error);
-      if (!data.length) { container.innerHTML = '<p>No users awaiting approval.</p>'; return; }
+      const c = document.getElementById('unapprovedUsers');
+      c.innerHTML = '';
       data.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'user-approval';
-        div.innerHTML = `
-          <div class="user-details"><strong>Email:</strong> ${u.email}<br><strong>Registered:</strong> ${new Date(u.created_at).toLocaleDateString()}</div>
-          <div><button class="btn approve-btn" onclick="approveUser('${u.user_id}')">Approve</button>
-               <button class="btn reject-btn" onclick="rejectUser('${u.user_id}')">Reject</button></div>
+        const d = document.createElement('div');
+        d.className = 'user-approval';
+        d.innerHTML = `
+          <div class="user-details">
+            <strong>Email:</strong> ${u.email}<br>
+            <strong>Registered:</strong> ${new Date(u.created_at).toLocaleDateString()}
+          </div>
+          <div>
+            <button class="btn approve-btn" onclick="approveUser('${u.user_id}')">Approve</button>
+            <button class="btn reject-btn" onclick="rejectUser('${u.user_id}')">Reject</button>
+          </div>
         `;
-        container.appendChild(div);
+        c.appendChild(d);
       });
     }
+
     async function approveUser(id) {
-      await supabase.from('approved_users').upsert({ user_id:id,approved:true },{onConflict:'user_id'});
+      await supabase.from('approved_users')
+        .upsert({user_id:id,approved:true},{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
     async function rejectUser(id) {
-      await supabase.from('approved_users').upsert({ user_id:id,approved:false },{onConflict:'user_id'});
+      await supabase.from('approved_users')
+        .upsert({user_id:id,approved:false},{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
+
     async function checkUserApproval(uid) {
-      const { data } = await supabase.from('approved_users').select('approved').eq('user_id',uid).maybeSingle();
-      return data?.approved===true;
+      const { data } = await supabase.from('approved_users')
+        .select('approved').eq('user_id',uid).maybeSingle();
+      return data?.approved === true;
     }
     async function checkAdminStatus(uid) {
-      const { data } = await supabase.from('user_roles').select('role').eq('user_id',uid).single();
-      return data?.role==='admin';
+      const { data } = await supabase.from('user_roles')
+        .select('role').eq('user_id',uid).single();
+      return data?.role === 'admin';
     }
+
     function showSection(sec) {
-      ['timeline','contribute','approvals'].forEach(s=>{
-        document.getElementById(s).style.display=s===sec?'block':'none';
-        document.getElementById(s+'Link')?.classList.toggle('active',s===sec);
+      ['timeline','contribute','approvals'].forEach(s => {
+        document.getElementById(s).style.display = s===sec?'block':'none';
+        document.getElementById(s+'Link')?.classList
+          .toggle('active', s===sec);
       });
-      if(sec==='approvals') loadUnapprovedUsers();
+      if (sec==='approvals') loadUnapprovedUsers();
     }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      const { data:{session} } = await supabase.auth.getSession();
-      await loadEvents();
-      if (session) {
-        const uid = session.user.id;
-        if (await checkUserApproval(uid)) document.getElementById('eventForm').style.display='block';
-        else {
-          const m = document.getElementById('welcomeMessage');
-          m.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
-          m.style.display = 'block';
-        }
-        document.getElementById('signinButton').style.display='none';
-        document.getElementById('logoutButton').style.display='block';
-        if (await checkAdminStatus(uid)) document.getElementById('approvalsLink').style.display='list-item';
-      }
-    });
-
-    document.getElementById('eventForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const { data:{user} } = await supabase.auth.getUser();
-      await supabase.from('events').insert([{
-        title: document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        event_start: document.getElementById('eventStart').value,
-        event_end: document.getElementById('eventEnd').value || null,
-        image_url: document.getElementById('imageUrl').value,
-        user_id: user.id
-      }]);
-      await loadEvents();
-      e.target.reset();
-    });
   </script>
 </body>
 </html>
