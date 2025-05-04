@@ -108,7 +108,7 @@
       font-weight: bold;
       font-size: 1.2rem;
     }
-    #authModal {
+    .modal {
       display: none;
       position: fixed;
       z-index: 9999;
@@ -127,8 +127,10 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       width: 300px;
       text-align: center;
+      position: relative;
     }
-    .modal-content input {
+    .modal-content input,
+    .modal-content textarea {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 1rem;
@@ -159,13 +161,6 @@
     .reject-btn:hover {
       background-color: #c82333;
     }
-    form input, form textarea {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
     form button {
       width: 100%;
     }
@@ -178,9 +173,6 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       padding: 1rem;
       margin-bottom: 1rem;
-    }
-    .user-details {
-      flex: 1;
     }
     footer {
       background-color: #4D1979;
@@ -254,6 +246,9 @@
 
   <main>
     <div id="timeline">
+      <div class="toolbar" style="margin-bottom:1rem;">
+        <button id="addEventBtn" class="btn">Add Event</button>
+      </div>
       <div id="events"></div>
       <div id="welcomeMessage"></div>
       <h2>Add Event</h2>
@@ -292,9 +287,26 @@
     </div>
   </div>
 
+  <!-- EVENT MODAL -->
+  <div id="eventModal" class="modal">
+    <div class="modal-content">
+      <span id="closeEventModal" style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
+      <h3 id="modalTitle">Add Event</h3>
+      <form id="eventModalForm">
+        <input type="hidden" id="eventId">
+        <input type="text" id="modalTitleInput" placeholder="Event Title" required>
+        <textarea id="modalDescription" placeholder="Event Description" required></textarea>
+        <input type="date" id="modalStart" required>
+        <input type="date" id="modalEnd"><
+        input type="url" id="modalImageUrl" placeholder="Image URL">
+        <button type="submit" class="btn" id="saveEventBtn">Save</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = 'https://ckpnlhhqqrmavvwqggdh.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrcG5saGhxcXJtYXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_KEY';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function showAuthModal() {
@@ -305,13 +317,10 @@
       const email = document.getElementById('loginEmail').value;
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          emailRedirectTo: window.location.origin + window.location.pathname
-        }
+        options: { emailRedirectTo: window.location.origin + window.location.pathname }
       });
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
+      if (error) alert('Login error: ' + error.message);
+      else {
         alert('Check your email for the magic login link.');
         document.getElementById('authModal').style.display = 'none';
       }
@@ -326,50 +335,92 @@
       document.getElementById('welcomeMessage').style.display = 'none';
     }
 
+    // —— Existing loadEvents redefined to include edit/delete icons ——
     async function loadEvents() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentUserId = sessionData?.session?.user?.id;
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .order('event_start', { ascending: true });
       const container = document.getElementById('events');
       container.innerHTML = '';
-      if (error) {
-        console.error('Error loading events:', error);
-        return;
-      }
-      data.forEach(event => {
+      if (error) return console.error('Error loading events:', error);
+
+      data.forEach(evt => {
         const div = document.createElement('div');
         div.className = 'event';
+        let controls = '';
+        if (currentUserId === evt.user_id) {
+          controls = `
+            <span style="position:absolute; top:0.5rem; right:2.5rem; cursor:pointer;" onclick="onEdit('${evt.id}')">🖉</span>
+            <span style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;" onclick="onDelete('${evt.id}')">🗑️</span>
+          `;
+        }
         div.innerHTML = `
-          <div class="event-title">${event.title} (${new Date(event.event_start).getFullYear()})</div>
-          <div>${event.description}</div>
-          ${event.image_url 
-            ? `<img 
-                 src="${event.image_url}" 
-                 alt="Image for ${event.title}" 
-                 style="max-width:100%;height:auto;margin-top:0.5rem;"
-                 onerror="this.style.display='none'"
-               />`
-            : ''}
+          <div class="event-title">${evt.title} (${new Date(evt.event_start).getFullYear()})</div>
+          <div>${evt.description}</div>
+          ${evt.image_url ? `<img src="${evt.image_url}" style="max-width:100%;margin-top:0.5rem;" onerror="this.style.display='none'"/>` : ''}
+          ${controls}
         `;
         container.appendChild(div);
       });
     }
 
+    window.onEdit = async function(id) {
+      const { data: [evt] } = await supabase.from('events').select('*').eq('id', id);
+      document.getElementById('eventId').value    = evt.id;
+      document.getElementById('modalTitleInput').value    = evt.title;
+      document.getElementById('modalDescription').value   = evt.description;
+      document.getElementById('modalStart').value         = evt.event_start.split('T')[0];
+      document.getElementById('modalEnd').value           = evt.event_end?.split('T')[0] || '';
+      document.getElementById('modalImageUrl').value      = evt.image_url || '';
+      document.getElementById('modalTitle').textContent   = 'Edit Event';
+      document.getElementById('eventModal').style.display = 'flex';
+    };
+
+    window.onDelete = function(id) {
+      if (confirm('Are you sure you want to delete this event?')) {
+        supabase.from('events').delete().eq('id', id).then(loadEvents);
+      }
+    };
+
+    document.getElementById('addEventBtn').addEventListener('click', () => {
+      document.getElementById('modalTitle').textContent = 'Add Event';
+      document.getElementById('eventModalForm').reset();
+      document.getElementById('eventId').value = '';
+      document.getElementById('eventModal').style.display = 'flex';
+    });
+    document.getElementById('closeEventModal').addEventListener('click', () => {
+      document.getElementById('eventModal').style.display = 'none';
+    });
+
+    document.getElementById('eventModalForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = document.getElementById('eventId').value;
+      const payload = {
+        title: document.getElementById('modalTitleInput').value,
+        description: document.getElementById('modalDescription').value,
+        event_start: document.getElementById('modalStart').value,
+        event_end: document.getElementById('modalEnd').value || null,
+        image_url: document.getElementById('modalImageUrl').value
+      };
+      if (id) await supabase.from('events').update(payload).eq('id', id);
+      else {
+        const { data: { user } } = await supabase.auth.getUser();
+        payload.user_id = user.id;
+        await supabase.from('events').insert([payload]);
+      }
+      document.getElementById('eventModal').style.display = 'none';
+      loadEvents();
+    });
+
     async function loadUnapprovedUsers() {
-      const { data, error } = await supabase
-        .from('unapproved_users_view')
-        .select('user_id, email, created_at');
+      const { data, error } = await supabase.from('unapproved_users_view').select('user_id, email, created_at');
       const container = document.getElementById('unapprovedUsers');
       container.innerHTML = '';
-      if (error) {
-        console.error('Error loading unapproved users:', error);
-        return;
-      }
-      if (data.length === 0) {
-        container.innerHTML = '<p>No users awaiting approval.</p>';
-        return;
-      }
+      if (error) return console.error('Error loading unapproved users:', error);
+      if (!data.length) { container.innerHTML = '<p>No users awaiting approval.</p>'; return; }
       data.forEach(u => {
         const div = document.createElement('div');
         div.className = 'user-approval';
@@ -387,64 +438,21 @@
       });
     }
 
-    // —— UPSERT-based approval/rejection ——
     async function approveUser(id) {
-      console.log('Attempting to approve user:', id);
-
-      const { data, error } = await supabase
-        .from('approved_users')
-        .upsert(
-          { user_id: id, approved: true },
-          { onConflict: 'user_id' }
-        )
-        .select();
-
-      if (error) {
-        alert(`Failed to approve user: ${error.message}`);
-        console.error(error);
-      } else {
-        console.log('User approved:', data);
-      }
-
+      await supabase.from('approved_users').upsert({ user_id: id, approved: true }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
-
     async function rejectUser(id) {
-      console.log('Attempting to reject user:', id);
-
-      const { data, error } = await supabase
-        .from('approved_users')
-        .upsert(
-          { user_id: id, approved: false },
-          { onConflict: 'user_id' }
-        )
-        .select();
-
-      if (error) {
-        alert(`Failed to reject user: ${error.message}`);
-        console.error(error);
-      } else {
-        console.log('User rejected:', data);
-      }
-
+      await supabase.from('approved_users').upsert({ user_id: id, approved: false }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
 
     async function checkUserApproval(userId) {
-      const { data } = await supabase
-        .from('approved_users')
-        .select('approved')
-        .eq('user_id', userId)
-        .maybeSingle();
+      const { data } = await supabase.from('approved_users').select('approved').eq('user_id', userId).maybeSingle();
       return data?.approved === true;
     }
-
     async function checkAdminStatus(userId) {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).single();
       return data?.role === 'admin';
     }
 
@@ -459,26 +467,18 @@
     window.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabase.auth.getSession();
       await loadEvents();
-
       if (session) {
         const userId = session.user.id;
         const approved = await checkUserApproval(userId);
-
-        if (approved) {
-          document.getElementById('eventForm').style.display = 'block';
-        } else {
+        if (approved) document.getElementById('eventForm').style.display = 'block';
+        else {
           const msg = document.getElementById('welcomeMessage');
-          msg.textContent =
-            'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
+          msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
           msg.style.display = 'block';
         }
-
         document.getElementById('signinButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'block';
-
-        if (await checkAdminStatus(userId)) {
-          document.getElementById('approvalsLink').style.display = 'list-item';
-        }
+        if (await checkAdminStatus(userId)) document.getElementById('approvalsLink').style.display = 'list-item';
       }
     });
 
