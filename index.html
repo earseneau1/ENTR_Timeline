@@ -125,53 +125,38 @@
       <h1>Entrepreneurship History Timeline</h1>
       <nav>
         <ul>
-          <li><a href="#" id="homeLink" class="active"
-                 onclick="showSection('timeline')">Home</a></li>
-          <li><a href="#" id="contributeLink"
-                 onclick="showSection('contribute')">Contribute</a></li>
-          <li id="approvalsLink" style="display:none">
-            <a href="#" onclick="showSection('approvals')">Approvals</a>
-          </li>
+          <li><a href="#" id="homeLink" class="active" onclick="showSection('timeline')">Home</a></li>
+          <li><a href="#" id="contributeLink" onclick="showSection('contribute')">Contribute</a></li>
+          <li id="approvalsLink" style="display:none"><a href="#" onclick="showSection('approvals')">Approvals</a></li>
         </ul>
       </nav>
     </div>
     <div class="header-right">
-      <button id="signinButton" class="btn"
-              onclick="showAuthModal()">Sign In / Sign Up</button>
-      <div id="logoutButton" style="display:none">
-        <button class="btn" onclick="logout()">Log Out</button>
-      </div>
+      <button id="signinButton" class="btn" onclick="showAuthModal()">Sign In / Sign Up</button>
+      <div id="logoutButton" style="display:none"><button class="btn" onclick="logout()">Log Out</button></div>
     </div>
   </header>
 
   <main>
     <div id="timeline">
-      <div class="toolbar" style="margin-bottom:1rem;">
-        <button id="addEventBtn" class="btn">Add Event</button>
-      </div>
+      <div class="toolbar" style="margin-bottom:1rem;"><button id="addEventBtn" class="btn">Add Event</button></div>
       <div id="events"></div>
       <div id="welcomeMessage"></div>
-
       <h2>Add Event</h2>
       <form id="eventForm" style="display:none">
         <input type="text" id="title" placeholder="Event Title" required><br>
-        <textarea id="description"
-                  placeholder="Event Description" required></textarea><br>
+        <textarea id="description" placeholder="Event Description" required></textarea><br>
         <input type="date" id="eventStart" required><br>
         <input type="date" id="eventEnd"><br>
         <input type="url" id="imageUrl" placeholder="Image URL"><br>
         <button type="submit" class="btn">Add Event</button>
       </form>
     </div>
-
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
-      <p>Fork the repo, make changes, and submit a PR. Visit the
-         <a href="https://github.com/earseneau1/ENTR_20263"
-            target="_blank" rel="noopener">GitHub Repo</a>.</p>
+      <p>Fork the repo, make changes, and submit a PR. Visit the <a href="https://github.com/earseneau1/ENTR_20263" target="_blank" rel="noopener">GitHub Repo</a>.</p>
       <p>Once approved, you can add events via the form on Home.</p>
     </div>
-
     <div id="approvals" style="display:none">
       <h2>Pending Approvals</h2>
       <div id="unapprovedUsers"></div>
@@ -183,12 +168,9 @@
   <!-- Magic-link popup -->
   <div id="authModal" class="modal">
     <div class="modal-content">
-      <span onclick="document.getElementById('authModal').style.display='none'"
-            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;
-                   font-size:1.2rem;">×</span>
+      <span onclick="document.getElementById('authModal').style.display='none'" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
       <p><strong>Enter your email to receive a magic link:</strong></p>
-      <input type="email" id="loginEmail"
-             placeholder="you@example.com" required />
+      <input type="email" id="loginEmail" placeholder="you@example.com" required />
       <button class="btn" onclick="login()">Send Magic Link</button>
     </div>
   </div>
@@ -196,20 +178,15 @@
   <!-- Add/Edit Event popup -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
-      <span id="closeEventModal"
-            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;
-                   font-size:1.2rem;">×</span>
+      <span id="closeEventModal" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
       <h3 id="modalTitle">Add Event</h3>
       <form id="eventModalForm">
         <input type="hidden" id="eventId">
-        <input type="text" id="modalTitleInput"
-               placeholder="Event Title" required>
-        <textarea id="modalDescription"
-                  placeholder="Event Description" required></textarea>
+        <input type="text" id="modalTitleInput" placeholder="Event Title" required>
+        <textarea id="modalDescription" placeholder="Event Description" required></textarea>
         <input type="date" id="modalStart" required>
         <input type="date" id="modalEnd">
-        <input type="url" id="modalImageUrl"
-               placeholder="Image URL">
+        <input type="url" id="modalImageUrl" placeholder="Image URL">
         <button type="submit" class="btn" id="saveEventBtn">Save</button>
       </form>
     </div>
@@ -222,27 +199,20 @@
       + 'YXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1'
       + 'MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.'
       + 'SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
-    const supabase = window.supabase
-      .createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('signinButton')
-              .addEventListener('click', showAuthModal);
-      document.getElementById('closeEventModal')
-              .addEventListener('click', () =>
-                document.getElementById('eventModal')
-                        .style.display = 'none');
-      document.getElementById('addEventBtn')
-              .addEventListener('click', () => {
+      document.getElementById('signinButton').addEventListener('click', showAuthModal);
+      document.getElementById('closeEventModal').addEventListener('click', () =>
+        document.getElementById('eventModal').style.display = 'none');
+      document.getElementById('addEventBtn').addEventListener('click', () => {
         document.getElementById('modalTitle').textContent = 'Add Event';
         document.getElementById('eventModalForm').reset();
         document.getElementById('eventId').value = '';
         document.getElementById('eventModal').style.display = 'flex';
       });
-      document.getElementById('eventModalForm')
-              .addEventListener('submit', handleEventForm);
-      document.getElementById('eventForm')
-              .addEventListener('submit', handleQuickAdd);
+      document.getElementById('eventModalForm').addEventListener('submit', handleEventForm);
+      document.getElementById('eventForm').addEventListener('submit', handleQuickAdd);
       init();
     });
 
@@ -259,7 +229,7 @@
           m.style.display = 'block';
         }
         document.getElementById('signinButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'block';  
+        document.getElementById('logoutButton').style.display = 'block';
         if (await checkAdminStatus(uid)) {
           document.getElementById('approvalsLink').style.display = 'list-item';
         }
@@ -276,9 +246,8 @@
         email,
         options: { emailRedirectTo: window.location.href }
       });
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
+      if (error) alert('Login error: ' + error.message);
+      else {
         alert('Check your email for the magic login link.');
         document.getElementById('authModal').style.display = 'none';
       }
@@ -295,26 +264,23 @@
     async function loadEvents() {
       const { data: { session } } = await supabase.auth.getSession();
       const uid = session?.user?.id;
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('event_start', { ascending: true });
+      const { data, error } = await supabase.from('events').select('*').order('event_start', { ascending: true });
       if (error) return console.error(error);
       const container = document.getElementById('events');
       container.innerHTML = '';
       data.forEach(evt => {
         const div = document.createElement('div');
         div.className = 'event';
-        let ctrls = '';
+        let controls = '';
         if (uid === evt.user_id) {
-          ctrls = `<span onclick="onEdit('${evt.id}')"
-                        style="position:absolute;top:0.5rem;right:2.5rem;cursor:pointer;">
-                     🖉
-                   </span>` +
-                  `<span onclick="onDelete('${evt.id}')"
-                        style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;">
-                     🗑️
-                   </span>`;
+          controls = `
+            <i class="fa-regular fa-pen-to-square"
+               style="position:absolute; top:0.5rem; right:2.5rem; cursor:pointer;"
+               onclick="onEdit('${evt.id}')"></i>
+            <i class="fa-solid fa-trash"
+               style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;"
+               onclick="onDelete('${evt.id}')"></i>
+          `;
         }
         div.innerHTML = `
           <div class="event-title">
@@ -326,7 +292,7 @@
                       style="max-width:100%;margin-top:0.5rem;"
                       onerror="this.style.display='none'"/>`
              : ''}
-          ${ctrls}
+          ${controls}
         `;
         container.appendChild(div);
       });
@@ -335,7 +301,7 @@
     async function handleEventForm(e) {
       e.preventDefault();
       const id  = document.getElementById('eventId').value;
-      const pay = {
+      const payload = {
         title:       document.getElementById('modalTitleInput').value,
         description: document.getElementById('modalDescription').value,
         event_start: document.getElementById('modalStart').value,
@@ -343,11 +309,11 @@
         image_url:   document.getElementById('modalImageUrl').value
       };
       if (id) {
-        await supabase.from('events').update(pay).eq('id', id);
+        await supabase.from('events').update(payload).eq('id', id);
       } else {
-        const { data:{user} } = await supabase.auth.getUser();
-        pay.user_id = user.id;
-        await supabase.from('events').insert([pay]);
+        const { data: { user } } = await supabase.auth.getUser();
+        payload.user_id = user.id;
+        await supabase.from('events').insert([payload]);
       }
       document.getElementById('eventModal').style.display = 'none';
       await loadEvents();
@@ -355,7 +321,7 @@
 
     async function handleQuickAdd(e) {
       e.preventDefault();
-      const { data:{user} } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       await supabase.from('events').insert([{
         title:       document.getElementById('title').value,
         description: document.getElementById('description').value,
@@ -369,15 +335,14 @@
     }
 
     window.onEdit = async id => {
-      const { data:[evt] } = await supabase.from('events')
-        .select('*').eq('id', id);
-      document.getElementById('eventId').value            = evt.id;
-      document.getElementById('modalTitleInput').value    = evt.title;
-      document.getElementById('modalDescription').value   = evt.description;
-      document.getElementById('modalStart').value         = evt.event_start.split('T')[0];
-      document.getElementById('modalEnd').value           = evt.event_end?.split('T')[0] || '';
-      document.getElementById('modalImageUrl').value      = evt.image_url || '';
-      document.getElementById('modalTitle').textContent   = 'Edit Event';
+      const { data: [evt] } = await supabase.from('events').select('*').eq('id', id);
+      document.getElementById('eventId').value = evt.id;
+      document.getElementById('modalTitleInput').value = evt.title;
+      document.getElementById('modalDescription').value = evt.description;
+      document.getElementById('modalStart').value = evt.event_start.split('T')[0];
+      document.getElementById('modalEnd').value = evt.event_end?.split('T')[0] || '';
+      document.getElementById('modalImageUrl').value = evt.image_url || '';
+      document.getElementById('modalTitle').textContent = 'Edit Event';
       document.getElementById('eventModal').style.display = 'flex';
     };
 
@@ -388,9 +353,7 @@
     };
 
     async function loadUnapprovedUsers() {
-      const { data, error } = await supabase
-        .from('unapproved_users_view')
-        .select('user_id,email,created_at');
+      const { data, error } = await supabase.from('unapproved_users_view').select('user_id,email,created_at');
       if (error) return console.error(error);
       const c = document.getElementById('unapprovedUsers');
       c.innerHTML = '';
@@ -412,32 +375,27 @@
     }
 
     async function approveUser(id) {
-      await supabase.from('approved_users')
-        .upsert({user_id:id,approved:true},{onConflict:'user_id'});
+      await supabase.from('approved_users').upsert({user_id:id,approved:true},{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
     async function rejectUser(id) {
-      await supabase.from('approved_users')
-        .upsert({user_id:id,approved:false},{onConflict:'user_id'});
+      await supabase.from('approved_users').upsert({user_id:id,approved:false},{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
 
     async function checkUserApproval(uid) {
-      const { data } = await supabase.from('approved_users')
-        .select('approved').eq('user_id',uid).maybeSingle();
+      const { data } = await supabase.from('approved_users').select('approved').eq('user_id',uid).maybeSingle();
       return data?.approved === true;
     }
     async function checkAdminStatus(uid) {
-      const { data } = await supabase.from('user_roles')
-        .select('role').eq('user_id',uid).single();
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id',uid).single();
       return data?.role === 'admin';
     }
 
     function showSection(sec) {
       ['timeline','contribute','approvals'].forEach(s => {
         document.getElementById(s).style.display = s===sec?'block':'none';
-        document.getElementById(s+'Link')?.classList
-          .toggle('active', s===sec);
+        document.getElementById(s+'Link')?.classList.toggle('active', s===sec);
       });
       if (sec==='approvals') loadUnapprovedUsers();
     }
