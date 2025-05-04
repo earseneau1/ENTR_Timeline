@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Entrepreneurship Timeline</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pIVpPzIulGvpIhBJtgflTdVx3FX2FhaIOq0lsl+AADE5Cm6+yak5IyVbhtdB8+38EVpHgnD7XNEb5lc10/3pTA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
   <!-- Explicit UMD bundle to ensure compatibility -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
   <style>
@@ -309,8 +319,12 @@
         let controls = '';
         if (currentUserId === evt.user_id) {
           controls = `
-            <span style="position:absolute; top:0.5rem; right:2.5rem; cursor:pointer;" onclick="onEdit('${evt.id}')">🖉</span>
-            <span style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;" onclick="onDelete('${evt.id}')">🗑️</span>
+            <span style="position:absolute; top:0.5rem; right:2.5rem; cursor:pointer;" onclick="onEdit('${evt.id}')">
+              <i class="fas fa-pencil-alt"></i>
+            </span>
+            <span style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer;" onclick="onDelete('${evt.id}')">
+              <i class="fas fa-trash"></i>
+            </span>
           `;
         }
         div.innerHTML = `
