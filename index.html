@@ -7,14 +7,221 @@
   <!-- Explicit UMD bundle to ensure compatibility -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
   <style>
-    /* your existing CSS… */
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f4f6f9;
       margin: 0;
       padding: 0;
     }
-    /* …snip… */
+    header {
+      background-color: rgba(77, 25, 121, 0.8);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    .header-left h1 {
+      margin: 0 2rem 0 0;
+      font-size: 1.5rem;
+    }
+    .header-left nav ul {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .header-left nav ul li {
+      margin-right: 1rem;
+    }
+    .header-left nav ul li a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .header-left nav ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .header-left nav ul li a.active {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      padding-bottom: 5rem;
+    }
+    #events {
+      position: relative;
+      padding-left: 2rem;
+    }
+    #events::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #ccc;
+    }
+    .event {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: fadeIn 0.5s forwards;
+    }
+    .event::before {
+      content: '';
+      position: absolute;
+      left: -1.5rem;
+      top: 0.5rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background-color: #4D1979;
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .event-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    #authModal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      width: 300px;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      background-color: #4D1979;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background-color: #3d144f;
+    }
+    .approve-btn {
+      background-color: #28a745;
+    }
+    .approve-btn:hover {
+      background-color: #218838;
+    }
+    .reject-btn {
+      background-color: #dc3545;
+    }
+    .reject-btn:hover {
+      background-color: #c82333;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      width: 100%;
+    }
+    .user-approval {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .user-details {
+      flex: 1;
+    }
+    footer {
+      background-color: #4D1979;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 0.5rem;
+      }
+      .header-left {
+        flex-direction: column;
+        align-items: center;
+      }
+      .header-left h1 {
+        margin-bottom: 0.5rem;
+      }
+      .header-left nav ul {
+        flex-direction: column;
+      }
+      .header-left nav ul li {
+        margin-bottom: 1rem;
+      }
+      .header-right {
+        margin-top: 1rem;
+      }
+      .user-approval {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .user-approval div {
+        margin-top: 1rem;
+      }
+    }
     #welcomeMessage {
       display: none;
       margin: 1rem 0;
@@ -223,7 +430,6 @@
       loadUnapprovedUsers();
     }
 
-    // check if current user is approved for editing
     async function checkUserApproval(userId) {
       const { data } = await supabase
         .from('approved_users')
@@ -233,7 +439,6 @@
       return data?.approved === true;
     }
 
-    // check if current user is an admin
     async function checkAdminStatus(userId) {
       const { data, error } = await supabase
         .from('user_roles')
@@ -251,7 +456,6 @@
       if (sec === 'approvals') loadUnapprovedUsers();
     }
 
-    // on page load
     window.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabase.auth.getSession();
       await loadEvents();
@@ -264,7 +468,7 @@
           document.getElementById('eventForm').style.display = 'block';
         } else {
           const msg = document.getElementById('welcomeMessage');
-          msg.textContent = 
+          msg.textContent =
             'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
           msg.style.display = 'block';
         }
@@ -278,7 +482,6 @@
       }
     });
 
-    // event submission
     document.getElementById('eventForm').addEventListener('submit', async e => {
       e.preventDefault();
       const { data: { user } } = await supabase.auth.getUser();
