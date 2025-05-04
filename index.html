@@ -24,23 +24,10 @@
       top: 0;
       z-index: 1000;
     }
-    .header-left {
-      display: flex;
-      align-items: center;
-    }
-    .header-left h1 {
-      margin: 0 2rem 0 0;
-      font-size: 1.5rem;
-    }
-    .header-left nav ul {
-      display: flex;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .header-left nav ul li {
-      margin-right: 1rem;
-    }
+    .header-left { display: flex; align-items: center; }
+    .header-left h1 { margin: 0 2rem 0 0; font-size: 1.5rem; }
+    .header-left nav ul { display: flex; list-style: none; padding: 0; margin: 0; }
+    .header-left nav ul li { margin-right: 1rem; }
     .header-left nav ul li a {
       color: white;
       text-decoration: none;
@@ -48,22 +35,17 @@
       border-radius: 4px;
       transition: background-color 0.3s;
     }
-    .header-left nav ul li a:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-    .header-left nav ul li a.active {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-    }
+    .header-left nav ul li a:hover { background-color: rgba(255,255,255,0.2); }
+    .header-left nav ul li a.active { background-color: rgba(255,255,255,0.3); }
+    .header-right { display: flex; align-items: center; }
+
     main {
       max-width: 900px;
       margin: 2rem auto;
       padding: 1rem;
       padding-bottom: 5rem;
     }
+
     #events {
       position: relative;
       padding-left: 2rem;
@@ -77,10 +59,11 @@
       width: 2px;
       background-color: #ccc;
     }
+
     .event {
       background: white;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       padding: 1rem;
       margin-bottom: 1.5rem;
       position: relative;
@@ -104,10 +87,9 @@
         transform: translateX(0);
       }
     }
-    .event-title {
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
+    .event-title { font-weight: bold; font-size: 1.2rem; }
+
+    /* generic modal overlay */
     .modal {
       display: none;
       position: fixed;
@@ -120,11 +102,25 @@
       justify-content: center;
       align-items: center;
     }
+    /* magic-link modal must float above everything */
+    #authModal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
     .modal-content {
       background: white;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       width: 300px;
       text-align: center;
       position: relative;
@@ -137,6 +133,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     .btn {
       background-color: #4D1979;
       color: white;
@@ -146,34 +143,24 @@
       border-radius: 4px;
       transition: background-color 0.3s;
     }
-    .btn:hover {
-      background-color: #3d144f;
-    }
-    .approve-btn {
-      background-color: #28a745;
-    }
-    .approve-btn:hover {
-      background-color: #218838;
-    }
-    .reject-btn {
-      background-color: #dc3545;
-    }
-    .reject-btn:hover {
-      background-color: #c82333;
-    }
-    form button {
-      width: 100%;
-    }
+    .btn:hover { background-color: #3d144f; }
+
+    .approve-btn { background-color: #28a745; }
+    .approve-btn:hover { background-color: #218838; }
+    .reject-btn { background-color: #dc3545; }
+    .reject-btn:hover { background-color: #c82333; }
+
     .user-approval {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: white;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       padding: 1rem;
       margin-bottom: 1rem;
     }
+
     footer {
       background-color: #4D1979;
       color: white;
@@ -185,35 +172,18 @@
       right: 0;
       z-index: 1000;
     }
+
     @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        padding: 0.5rem;
-      }
-      .header-left {
-        flex-direction: column;
-        align-items: center;
-      }
-      .header-left h1 {
-        margin-bottom: 0.5rem;
-      }
-      .header-left nav ul {
-        flex-direction: column;
-      }
-      .header-left nav ul li {
-        margin-bottom: 1rem;
-      }
-      .header-right {
-        margin-top: 1rem;
-      }
-      .user-approval {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .user-approval div {
-        margin-top: 1rem;
-      }
+      header { flex-direction: column; padding: 0.5rem; }
+      .header-left { flex-direction: column; align-items: center; }
+      .header-left h1 { margin-bottom: 0.5rem; }
+      .header-left nav ul { flex-direction: column; }
+      .header-left nav ul li { margin-bottom: 1rem; }
+      .header-right { margin-top: 1rem; }
+      .user-approval { flex-direction: column; align-items: flex-start; }
+      .user-approval div { margin-top: 1rem; }
     }
+
     #welcomeMessage {
       display: none;
       margin: 1rem 0;
@@ -251,15 +221,6 @@
       </div>
       <div id="events"></div>
       <div id="welcomeMessage"></div>
-      <h2>Add Event</h2>
-      <form id="eventForm" style="display:none">
-        <input type="text" id="title" placeholder="Event Title" required><br>
-        <textarea id="description" placeholder="Event Description" required></textarea><br>
-        <input type="date" id="eventStart" required><br>
-        <input type="date" id="eventEnd"><br>
-        <input type="url" id="imageUrl" placeholder="Image URL"><br>
-        <button type="submit" class="btn">Add Event</button>
-      </form>
     </div>
 
     <div id="contribute" style="display:none">
@@ -274,31 +235,32 @@
     </div>
   </main>
 
-  <footer>
-    © 2025 TCU Entrepreneurship & Innovation Department
-  </footer>
+  <footer>© 2025 TCU Entrepreneurship & Innovation Department</footer>
 
+  <!-- Magic‑link popup -->
   <div id="authModal">
     <div class="modal-content">
-      <span onclick="document.getElementById('authModal').style.display='none'" style="float:right; cursor:pointer;">×</span>
+      <span onclick="document.getElementById('authModal').style.display='none'" 
+            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
       <p><strong>Enter your email to receive a magic link:</strong></p>
       <input type="email" id="loginEmail" placeholder="you@example.com" required />
       <button class="btn" onclick="login()">Send Magic Link</button>
     </div>
   </div>
 
-  <!-- EVENT MODAL -->
+  <!-- Event popup (add/edit) -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
-      <span id="closeEventModal" style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
+      <span id="closeEventModal" 
+            style="position:absolute; top:0.5rem; right:0.75rem; cursor:pointer; font-size:1.2rem;">×</span>
       <h3 id="modalTitle">Add Event</h3>
       <form id="eventModalForm">
         <input type="hidden" id="eventId">
         <input type="text" id="modalTitleInput" placeholder="Event Title" required>
         <textarea id="modalDescription" placeholder="Event Description" required></textarea>
         <input type="date" id="modalStart" required>
-        <input type="date" id="modalEnd"><
-        input type="url" id="modalImageUrl" placeholder="Image URL">
+        <input type="date" id="modalEnd">
+        <input type="url" id="modalImageUrl" placeholder="Image URL">
         <button type="submit" class="btn" id="saveEventBtn">Save</button>
       </form>
     </div>
@@ -312,7 +274,6 @@
     function showAuthModal() {
       document.getElementById('authModal').style.display = 'flex';
     }
-
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const { error } = await supabase.auth.signInWithOtp({
@@ -325,27 +286,22 @@
         document.getElementById('authModal').style.display = 'none';
       }
     }
-
     async function logout() {
       await supabase.auth.signOut();
       document.getElementById('logoutButton').style.display = 'none';
-      document.getElementById('eventForm').style.display = 'none';
       document.getElementById('signinButton').style.display = 'block';
       document.getElementById('approvalsLink').style.display = 'none';
       document.getElementById('welcomeMessage').style.display = 'none';
     }
 
-    // —— Existing loadEvents redefined to include edit/delete icons ——
     async function loadEvents() {
       const { data: sessionData } = await supabase.auth.getSession();
       const currentUserId = sessionData?.session?.user?.id;
       const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('event_start', { ascending: true });
+        .from('events').select('*').order('event_start', { ascending: true });
       const container = document.getElementById('events');
       container.innerHTML = '';
-      if (error) return console.error('Error loading events:', error);
+      if (error) return console.error(error);
 
       data.forEach(evt => {
         const div = document.createElement('div');
@@ -369,13 +325,13 @@
 
     window.onEdit = async function(id) {
       const { data: [evt] } = await supabase.from('events').select('*').eq('id', id);
-      document.getElementById('eventId').value    = evt.id;
-      document.getElementById('modalTitleInput').value    = evt.title;
-      document.getElementById('modalDescription').value   = evt.description;
-      document.getElementById('modalStart').value         = evt.event_start.split('T')[0];
-      document.getElementById('modalEnd').value           = evt.event_end?.split('T')[0] || '';
-      document.getElementById('modalImageUrl').value      = evt.image_url || '';
-      document.getElementById('modalTitle').textContent   = 'Edit Event';
+      document.getElementById('eventId').value = evt.id;
+      document.getElementById('modalTitleInput').value = evt.title;
+      document.getElementById('modalDescription').value = evt.description;
+      document.getElementById('modalStart').value = evt.event_start.split('T')[0];
+      document.getElementById('modalEnd').value = evt.event_end?.split('T')[0] || '';
+      document.getElementById('modalImageUrl').value = evt.image_url || '';
+      document.getElementById('modalTitle').textContent = 'Edit Event';
       document.getElementById('eventModal').style.display = 'flex';
     };
 
@@ -416,75 +372,66 @@
     });
 
     async function loadUnapprovedUsers() {
-      const { data, error } = await supabase.from('unapproved_users_view').select('user_id, email, created_at');
+      const { data, error } = await supabase.from('unapproved_users_view').select('user_id,email,created_at');
       const container = document.getElementById('unapprovedUsers');
       container.innerHTML = '';
-      if (error) return console.error('Error loading unapproved users:', error);
+      if (error) return console.error(error);
       if (!data.length) { container.innerHTML = '<p>No users awaiting approval.</p>'; return; }
       data.forEach(u => {
         const div = document.createElement('div');
         div.className = 'user-approval';
         div.innerHTML = `
-          <div class="user-details">
-            <strong>Email:</strong> ${u.email}<br>
-            <strong>Registered:</strong> ${new Date(u.created_at).toLocaleDateString()}
-          </div>
-          <div>
-            <button class="btn approve-btn" onclick="approveUser('${u.user_id}')">Approve</button>
-            <button class="btn reject-btn" onclick="rejectUser('${u.user_id}')">Reject</button>
-          </div>
+          <div class="user-details"><strong>Email:</strong> ${u.email}<br><strong>Registered:</strong> ${new Date(u.created_at).toLocaleDateString()}</div>
+          <div><button class="btn approve-btn" onclick="approveUser('${u.user_id}')">Approve</button>
+               <button class="btn reject-btn" onclick="rejectUser('${u.user_id}')">Reject</button></div>
         `;
         container.appendChild(div);
       });
     }
-
     async function approveUser(id) {
-      await supabase.from('approved_users').upsert({ user_id: id, approved: true }, { onConflict: 'user_id' });
+      await supabase.from('approved_users').upsert({ user_id:id,approved:true },{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
     async function rejectUser(id) {
-      await supabase.from('approved_users').upsert({ user_id: id, approved: false }, { onConflict: 'user_id' });
+      await supabase.from('approved_users').upsert({ user_id:id,approved:false },{onConflict:'user_id'});
       loadUnapprovedUsers();
     }
-
-    async function checkUserApproval(userId) {
-      const { data } = await supabase.from('approved_users').select('approved').eq('user_id', userId).maybeSingle();
-      return data?.approved === true;
+    async function checkUserApproval(uid) {
+      const { data } = await supabase.from('approved_users').select('approved').eq('user_id',uid).maybeSingle();
+      return data?.approved===true;
     }
-    async function checkAdminStatus(userId) {
-      const { data } = await supabase.from('user_roles').select('role').eq('user_id', userId).single();
-      return data?.role === 'admin';
+    async function checkAdminStatus(uid) {
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id',uid).single();
+      return data?.role==='admin';
     }
-
     function showSection(sec) {
-      ['timeline','contribute','approvals'].forEach(s => {
-        document.getElementById(s).style.display = s === sec ? 'block' : 'none';
-        document.getElementById(s + 'Link')?.classList.toggle('active', s === sec);
+      ['timeline','contribute','approvals'].forEach(s=>{
+        document.getElementById(s).style.display=s===sec?'block':'none';
+        document.getElementById(s+'Link')?.classList.toggle('active',s===sec);
       });
-      if (sec === 'approvals') loadUnapprovedUsers();
+      if(sec==='approvals') loadUnapprovedUsers();
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data:{session} } = await supabase.auth.getSession();
       await loadEvents();
       if (session) {
-        const userId = session.user.id;
-        const approved = await checkUserApproval(userId);
-        if (approved) document.getElementById('eventForm').style.display = 'block';
+        const uid = session.user.id;
+        if (await checkUserApproval(uid)) document.getElementById('eventForm').style.display='block';
         else {
-          const msg = document.getElementById('welcomeMessage');
-          msg.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
-          msg.style.display = 'block';
+          const m = document.getElementById('welcomeMessage');
+          m.textContent = 'Thanks for signing in! Once you are approved, you will be able to add events. Your request has been sent to the admin.';
+          m.style.display = 'block';
         }
-        document.getElementById('signinButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'block';
-        if (await checkAdminStatus(userId)) document.getElementById('approvalsLink').style.display = 'list-item';
+        document.getElementById('signinButton').style.display='none';
+        document.getElementById('logoutButton').style.display='block';
+        if (await checkAdminStatus(uid)) document.getElementById('approvalsLink').style.display='list-item';
       }
     });
 
     document.getElementById('eventForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data:{user} } = await supabase.auth.getUser();
       await supabase.from('events').insert([{
         title: document.getElementById('title').value,
         description: document.getElementById('description').value,
