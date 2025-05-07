@@ -298,63 +298,15 @@
       });
     }
 
-    async function handleEventForm(e) {
-      e.preventDefault();
-      const id  = document.getElementById('eventId').value;
-      const payload = {
-        title:       document.getElementById('modalTitleInput').value,
-        description: document.getElementById('modalDescription').value,
-        event_start: document.getElementById('modalStart').value,
-        event_end:   document.getElementById('modalEnd').value || null,
-        image_url:   document.getElementById('modalImageUrl').value
-      };
-      if (id) {
-        await supabase.from('events').update(payload).eq('id', id);
-      } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        payload.user_id = user.id;
-        await supabase.from('events').insert([payload]);
-      }
-      document.getElementById('eventModal').style.display = 'none';
-      await loadEvents();
-    }
-
-    async function handleQuickAdd(e) {
-      e.preventDefault();
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from('events').insert([{
-        title:       document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        event_start: document.getElementById('eventStart').value,
-        event_end:   document.getElementById('eventEnd').value || null,
-        image_url:   document.getElementById('imageUrl').value,
-        user_id:     user.id
-      }]);
-      await loadEvents();
-      e.target.reset();
-    }
-
-    window.onEdit = async id => {
-      const { data: [evt] } = await supabase.from('events').select('*').eq('id', id);
-      document.getElementById('eventId').value = evt.id;
-      document.getElementById('modalTitleInput').value = evt.title;
-      document.getElementById('modalDescription').value = evt.description;
-      document.getElementById('modalStart').value = evt.event_start.split('T')[0];
-      document.getElementById('modalEnd').value = evt.event_end?.split('T')[0] || '';
-      document.getElementById('modalImageUrl').value = evt.image_url || '';
-      document.getElementById('modalTitle').textContent = 'Edit Event';
-      document.getElementById('eventModal').style.display = 'flex';
-    };
-
-    window.onDelete = id => {
-      if (confirm('Are you sure you want to delete this event?')) {
-        supabase.from('events').delete().eq('id', id).then(loadEvents);
-      }
-    };
-
+    // Updated loadUnapprovedUsers and helper:
     async function loadUnapprovedUsers() {
-      const { data, error } = await supabase.from('unapproved_users_view').select('user_id,email,created_at');
+      const { data, error } = await supabase
+        .from('pending_users')
+        .select('user_id,email,created_at')
+        .not('user_id', 'in', `(${await approvedUserIdsCSV()})`);
+
       if (error) return console.error(error);
+
       const c = document.getElementById('unapprovedUsers');
       c.innerHTML = '';
       data.forEach(u => {
@@ -374,12 +326,23 @@
       });
     }
 
+    async function approvedUserIdsCSV() {
+      const { data, error } = await supabase
+        .from('approved_users')
+        .select('user_id')
+        .eq('approved', true);
+
+      if (error || !data) return 'NULL'; // fallback to avoid crash
+      return data.map(d => `'${d.user_id}'`).join(',') || 'NULL';
+    }
+
     async function approveUser(id) {
-      await supabase.from('approved_users').upsert({user_id:id,approved:true},{onConflict:'user_id'});
+      await supabase.from('approved_users').upsert({ user_id:id, approved:true }, { onConflict:'user_id' });
       loadUnapprovedUsers();
     }
+
     async function rejectUser(id) {
-      await supabase.from('approved_users').upsert({user_id:id,approved:false},{onConflict:'user_id'});
+      await supabase.from('approved_users').upsert({ user_id:id, approved:false }, { onConflict:'user_id' });
       loadUnapprovedUsers();
     }
 
@@ -387,6 +350,7 @@
       const { data } = await supabase.from('approved_users').select('approved').eq('user_id',uid).maybeSingle();
       return data?.approved === true;
     }
+
     async function checkAdminStatus(uid) {
       const { data } = await supabase.from('user_roles').select('role').eq('user_id',uid).single();
       return data?.role === 'admin';
