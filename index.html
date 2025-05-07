@@ -142,15 +142,7 @@
       <div class="toolbar" style="margin-bottom:1rem;"><button id="addEventBtn" class="btn">Add Event</button></div>
       <div id="events"></div>
       <div id="welcomeMessage"></div>
-      <h2>Add Event</h2>
-      <form id="eventForm" style="display:none">
-        <input type="text" id="title" placeholder="Event Title" required><br>
-        <textarea id="description" placeholder="Event Description" required></textarea><br>
-        <input type="date" id="eventStart" required><br>
-        <input type="date" id="eventEnd"><br>
-        <input type="url" id="imageUrl" placeholder="Image URL"><br>
-        <button type="submit" class="btn">Add Event</button>
-      </form>
+      <!-- Removed the duplicated inline add-event form -->
     </div>
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
@@ -363,10 +355,10 @@
       if (session) {
         const uid = session.user.id;
         if (await checkUserApproval(uid)) {
-          document.getElementById('eventForm').style.display = 'block';
+          // no inline form to show
         } else {
           const m = document.getElementById('welcomeMessage');
-          m.textContent = 'Thanks for signing in! Once approved, you can add events.';
+          m.textContent = 'Thanks for signing in! Once approved, you can add events via the popup.';
           m.style.display = 'block';
         }
         document.getElementById('signinButton').style.display = 'none';
@@ -411,7 +403,6 @@
         await loadEvents();
       });
 
-      document.getElementById('eventForm').addEventListener('submit', handleQuickAdd);
       init();
     });
   </script>
