@@ -133,15 +133,24 @@
     // In production apps, you would never leave your keys exposed like this.
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Parse magic-link tokens from the URL on load
+    // Ensure this is globally available for the inline onclick
+    window.showAuthModal = function() {
+      document.getElementById('authModal').style.display = 'flex';
+    };
+
+    // Parse magic-link tokens on load without aborting the script
     (async () => {
-      const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
-      if (error && error.message !== 'No session found') {
-        console.error('Auth callback error:', error.message);
+      try {
+        const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+        if (error && error.message !== 'No session found') {
+          console.error('Auth callback error:', error.message);
+        }
+      } catch (e) {
+        console.warn('Ignored error in getSessionFromUrl():', e);
       }
     })();
 
-    // Re-init on sign-in
+    // Re-init when a user signs in
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         document.getElementById('authModal').style.display = 'none';
@@ -149,23 +158,27 @@
       }
     });
 
-    async function handleQuickAdd(e) {
-      e.preventDefault();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.warn('No authenticated user – cannot add event');
-        return;
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const redirectURL = window.location.origin + window.location.pathname;
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: redirectURL }
+      });
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Check your email for the magic link and click it right away.');
+        document.getElementById('authModal').style.display = 'none';
       }
-      await supabase.from('events').insert([{
-        title:       document.getElementById('title').value,
-        description: document.getElementById('description').value,
-        event_start: document.getElementById('eventStart').value,
-        event_end:   document.getElementById('eventEnd').value || null,
-        image_url:   document.getElementById('imageUrl').value,
-        user_id:     user.id
-      }]);
-      await loadEvents();
-      e.target.reset();
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      document.getElementById('logoutButton').style.display = 'none';
+      document.getElementById('signinButton').style.display = 'block';
+      document.getElementById('approvalsLink').style.display = 'none';
+      document.getElementById('welcomeMessage').style.display = 'none';
     }
 
     async function loadEvents() {
@@ -262,12 +275,84 @@
       await supabase.from('approved_users').upsert({ user_id: id, approved: true }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
+
     async function rejectUser(id) {
       await supabase.from('approved_users').upsert({ user_id: id, approved: false }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
 
     async function checkUserApproval(uid) {
-      const { data } = await supabase.from('approved_users').select('approved').eq('user
+      const { data } = await supabase.from('approved_users').select('approved').eq('user_id', uid).maybeSingle();
+      return data?.approved === true;
+    }
 
-::contentReference[oaicite:0]{index=0}
+    async function checkAdminStatus(uid) {
+      const { data } = await supabase.from('user_roles').select('role').eq('user_id', uid).single();
+      return data?.role === 'admin';
+    }
+
+    function showSection(sec) {
+      ['timeline','contribute','approvals'].forEach(s => {
+        document.getElementById(s).style.display = s === sec ? 'block' : 'none';
+        document.getElementById(s + 'Link')?.classList.toggle('active', s === sec);
+      });
+      if (sec === 'approvals') loadUnapprovedUsers();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('signinButton').addEventListener('click', showAuthModal);
+      document.getElementById('closeEventModal').addEventListener('click', () =>
+        document.getElementById('eventModal').style.display = 'none'
+      );
+      document.getElementById('addEventBtn').addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = 'Add Event';
+        document.getElementById('eventModalForm').reset();
+        document.getElementById('eventId').value = '';
+        document.getElementById('eventModal').style.display = 'flex';
+      });
+
+      document.getElementById('eventModalForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return console.warn('No authenticated user – cannot save event');
+        const id = document.getElementById('eventId').value;
+        const payload = {
+          title:       document.getElementById('modalTitleInput').value,
+          description: document.getElementById('modalDescription').value,
+          event_start: document.getElementById('modalStart').value,
+          event_end:   document.getElementById('modalEnd').value || null,
+          image_url:   document.getElementById('modalImageUrl').value,
+          user_id:     id ? undefined : user.id
+        };
+        if (id) {
+          await supabase.from('events').update(payload).eq('id', id);
+        } else {
+          await supabase.from('events').insert([payload]);
+        }
+        document.getElementById('eventModal').style.display = 'none';
+        await loadEvents();
+      });
+
+      init();
+    });
+
+    async function init() {
+      await loadEvents();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const uid = session.user.id;
+        if (!await checkUserApproval(uid)) {
+          const m = document.getElementById('welcomeMessage');
+          m.textContent = 'Thanks for signing in! Once approved, you can add events via the popup.';
+          m.style.display = 'block';
+        }
+        document.getElementById('signinButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'block';
+        if (await checkAdminStatus(uid)) {
+          document.getElementById('approvalsLink').style.display = 'list-item';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
