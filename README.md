@@ -2,16 +2,17 @@
 
 ## 🔔 Course Integration
 
-This web-based timeline was built for two reasons: 1) to invite students of **ENTR 20263: Entrepreneurship & Innovation** to explore key historical moments in entrepreneurship while simultaneously developing fluency with AI-assisted software development workflows. This hands-on experience is designed to complement class discussions on creativity, innovation, and technological change. 
+This web-based timeline was built for two reasons: 1) to invite students of **ENTR 20263: Entrepreneurship & Innovation** to explore key historical moments in entrepreneurship, while 2) simultaneously developing fluency with AI-assisted software development workflows. This hands-on experience is designed to complement class discussions on creativity, innovation, and technological change. 
 
 Students may wish to actively contribute to this project as part of their coursework. 
 
 In the required class assignment, students must:
 
-* Research **at least three significant events** in the national history of entrepreneurship and innovation.
+* Research **at least three significant events** in the national history of entrepreneurship and innovation. This report is turned in to D2L. 
 
 Students may optionally:
-* Use generative AI tools (e.g., Microsoft Copilot, ChatGPT, Claude, Lamma, etc.) to propose improvements to this website. The purpose of doing so is to get some exposure to increasing role of AI in software development, while also learning about databases, and other technical components of creating digital products.
+* Condense what was submitted in class to be posted to this website.
+* Then, students will be encouraged to use generative AI tools (e.g., Microsoft Copilot, ChatGPT, Claude, Lamma, etc.) to propose improvements to this website. The purpose of doing so is to get some exposure to increasing role of AI in software development, while also learning about databases, and other technical components of creating digital products.
 
 ## 🧠 Learning Objectives
 
