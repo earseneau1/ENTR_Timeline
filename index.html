@@ -11,97 +11,37 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         crossorigin="anonymous" />
   <style>
+    /* (Your existing styles unchanged) */
     body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; margin: 0; padding: 0; }
-    header {
-      background-color: rgba(77,25,121,0.8);
-      color: white; padding: 1rem;
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 1000;
-    }
+    header { background-color: rgba(77,25,121,0.8); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
     .header-left { display: flex; align-items: center; }
     .header-left h1 { margin: 0 2rem 0 0; font-size: 1.5rem; }
     .header-left nav ul { display: flex; list-style: none; padding: 0; margin: 0; }
     .header-left nav ul li { margin-right: 1rem; }
-    .header-left nav ul li a {
-      color: white; text-decoration: none;
-      padding: 0.5rem 1rem; border-radius: 4px;
-      transition: background-color 0.3s;
-    }
+    .header-left nav ul li a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: background-color 0.3s; }
     .header-left nav ul li a:hover { background-color: rgba(255,255,255,0.2); }
     .header-left nav ul li a.active { background-color: rgba(255,255,255,0.3); }
     .header-right { display: flex; align-items: center; }
-    main {
-      max-width: 900px; margin: 2rem auto;
-      padding: 1rem; padding-bottom: 5rem;
-    }
-    #events {
-      position: relative; padding-left: 2rem;
-    }
-    #events::before {
-      content: ''; position: absolute;
-      left: 1rem; top: 0; bottom: 0;
-      width: 2px; background-color: #ccc;
-    }
-    .event {
-      background: white; border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem; margin-bottom: 1.5rem;
-      position: relative; opacity: 0;
-      transform: translateX(-20px);
-      animation: fadeIn 0.5s forwards;
-    }
-    .event::before {
-      content: ''; position: absolute;
-      left: -1.5rem; top: 0.5rem;
-      width: 1rem; height: 1rem;
-      border-radius: 50%; background-color: #4D1979;
-    }
+    main { max-width: 900px; margin: 2rem auto; padding: 1rem; padding-bottom: 5rem; }
+    #events { position: relative; padding-left: 2rem; }
+    #events::before { content: ''; position: absolute; left: 1rem; top: 0; bottom: 0; width: 2px; background-color: #ccc; }
+    .event { background: white; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1.5rem; position: relative; opacity: 0; transform: translateX(-20px); animation: fadeIn 0.5s forwards; }
+    .event::before { content: ''; position: absolute; left: -1.5rem; top: 0.5rem; width: 1rem; height: 1rem; border-radius: 50%; background-color: #4D1979; }
     @keyframes fadeIn { to { opacity:1; transform: translateX(0); } }
     .event-title { font-weight: bold; font-size: 1.2rem; }
-
-    .modal, #authModal {
-      display: none; position: fixed;
-      left:0; top:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center; align-items: center;
-    }
+    .modal, #authModal { display: none; position: fixed; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
     .modal { z-index: 9999; }
     #authModal { z-index: 10000; }
-
-    .modal-content {
-      background: white; padding:2rem;
-      border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3);
-      width:300px; text-align:center; position: relative;
-    }
-    .modal-content input,
-    .modal-content textarea {
-      width:100%; padding:0.5rem;
-      margin-bottom:1rem; border:1px solid #ccc;
-      border-radius:4px;
-    }
-    .btn {
-      background-color:#4D1979; color:white;
-      border:none; padding:0.5rem 1rem;
-      cursor:pointer; border-radius:4px;
-      transition: background-color 0.3s;
-    }
+    .modal-content { background: white; padding:2rem; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.3); width:300px; text-align:center; position: relative; }
+    .modal-content input, .modal-content textarea { width:100%; padding:0.5rem; margin-bottom:1rem; border:1px solid #ccc; border-radius:4px; }
+    .btn { background-color:#4D1979; color:white; border:none; padding:0.5rem 1rem; cursor:pointer; border-radius:4px; transition: background-color 0.3s; }
     .btn:hover { background-color:#3d144f; }
     .approve-btn { background-color:#28a745; }
     .approve-btn:hover { background-color:#218838; }
     .reject-btn { background-color:#dc3545; }
     .reject-btn:hover { background-color:#c82333; }
-    .user-approval {
-      display:flex; justify-content:space-between; align-items:center;
-      background:white; border-radius:6px;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
-      padding:1rem; margin-bottom:1rem;
-    }
-    footer {
-      background-color:#4D1979; color:white;
-      text-align:center; padding:1rem 0;
-      position:fixed; bottom:0; left:0; right:0;
-      z-index:1000;
-    }
+    .user-approval { display:flex; justify-content:space-between; align-items:center; background:white; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:1rem; margin-bottom:1rem; }
+    footer { background-color:#4D1979; color:white; text-align:center; padding:1rem 0; position:fixed; bottom:0; left:0; right:0; z-index:1000; }
     @media(max-width:768px) {
       header { flex-direction:column; padding:0.5rem; }
       .header-left { flex-direction:column; align-items:center; }
@@ -112,11 +52,7 @@
       .user-approval { flex-direction:column; align-items:flex-start; }
       .user-approval div { margin-top:1rem; }
     }
-    #welcomeMessage {
-      display:none; margin:1rem 0;
-      padding:1rem; background:#e9ecef;
-      border-radius:4px; color:#333;
-    }
+    #welcomeMessage { display:none; margin:1rem 0; padding:1rem; background:#e9ecef; border-radius:4px; color:#333; }
   </style>
 </head>
 <body>
@@ -142,7 +78,6 @@
       <div class="toolbar" style="margin-bottom:1rem;"><button id="addEventBtn" class="btn">Add Event</button></div>
       <div id="events"></div>
       <div id="welcomeMessage"></div>
-      <!-- Removed the duplicated inline add-event form -->
     </div>
     <div id="contribute" style="display:none">
       <h2>Contribute</h2>
@@ -160,7 +95,8 @@
   <!-- Magic-link popup -->
   <div id="authModal" class="modal">
     <div class="modal-content">
-      <span onclick="document.getElementById('authModal').style.display='none'" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
+      <span onclick="document.getElementById('authModal').style.display='none'"
+            style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
       <p><strong>Enter your email to receive a magic link:</strong></p>
       <input type="email" id="loginEmail" placeholder="you@example.com" required />
       <button class="btn" onclick="login()">Send Magic Link</button>
@@ -170,7 +106,8 @@
   <!-- Add/Edit Event popup -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
-      <span id="closeEventModal" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
+      <span id="closeEventModal"
+            style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;">×</span>
       <h3 id="modalTitle">Add Event</h3>
       <form id="eventModalForm">
         <input type="hidden" id="eventId">
@@ -191,11 +128,34 @@
       + 'YXZ2d3FnZ2RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU1'
       + 'MjM1MjQsImV4cCI6MjA2MTA5OTUyNH0.'
       + 'SSIpzGuE48xy7E5pvv8nLaEU9lOSz8km6pI-jOz6Qc8';
+
+    // The database has RLS preventing attempts to modify the database.
+    // In production apps, you would never leave your keys exposed like this.
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Parse magic-link tokens from the URL on load
+    (async () => {
+      const { data, error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+      if (error && error.message !== 'No session found') {
+        console.error('Auth callback error:', error.message);
+      }
+    })();
+
+    // Re-init on sign-in
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        document.getElementById('authModal').style.display = 'none';
+        init();
+      }
+    });
 
     async function handleQuickAdd(e) {
       e.preventDefault();
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.warn('No authenticated user – cannot add event');
+        return;
+      }
       await supabase.from('events').insert([{
         title:       document.getElementById('title').value,
         description: document.getElementById('description').value,
@@ -238,9 +198,7 @@
           </div>
           <div>${evt.description}</div>
           ${evt.image_url
-             ? `<img src="${evt.image_url}"
-                      style="max-width:100%;margin-top:0.5rem;"
-                      onerror="this.style.display='none'"/>`
+             ? `<img src="${evt.image_url}" style="max-width:100%;margin-top:0.5rem;" onerror="this.style.display='none'"/>`
              : ''}
           ${controls}
         `;
@@ -301,110 +259,15 @@
     }
 
     async function approveUser(id) {
-      await supabase.from('approved_users').upsert({ user_id:id, approved:true }, { onConflict:'user_id' });
+      await supabase.from('approved_users').upsert({ user_id: id, approved: true }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
     async function rejectUser(id) {
-      await supabase.from('approved_users').upsert({ user_id:id, approved:false }, { onConflict:'user_id' });
+      await supabase.from('approved_users').upsert({ user_id: id, approved: false }, { onConflict: 'user_id' });
       loadUnapprovedUsers();
     }
 
     async function checkUserApproval(uid) {
-      const { data } = await supabase.from('approved_users').select('approved').eq('user_id',uid).maybeSingle();
-      return data?.approved === true;
-    }
-    async function checkAdminStatus(uid) {
-      const { data } = await supabase.from('user_roles').select('role').eq('user_id',uid).single();
-      return data?.role === 'admin';
-    }
+      const { data } = await supabase.from('approved_users').select('approved').eq('user
 
-    function showSection(sec) {
-      ['timeline','contribute','approvals'].forEach(s => {
-        document.getElementById(s).style.display = s===sec ? 'block' : 'none';
-        document.getElementById(s+'Link')?.classList.toggle('active', s===sec);
-      });
-      if (sec === 'approvals') loadUnapprovedUsers();
-    }
-
-    function showAuthModal() {
-      document.getElementById('authModal').style.display = 'flex';
-    }
-    async function login() {
-      const email = document.getElementById('loginEmail').value;
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.href }
-      });
-      if (error) alert('Login error: ' + error.message);
-      else {
-        alert('Check your email for the magic login link.');
-        document.getElementById('authModal').style.display = 'none';
-      }
-    }
-    async function logout() {
-      await supabase.auth.signOut();
-      document.getElementById('logoutButton').style.display = 'none';
-      document.getElementById('signinButton').style.display = 'block';
-      document.getElementById('approvalsLink').style.display = 'none';
-      document.getElementById('welcomeMessage').style.display = 'none';
-    }
-
-    async function init() {
-      await loadEvents();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const uid = session.user.id;
-        if (await checkUserApproval(uid)) {
-          // no inline form to show
-        } else {
-          const m = document.getElementById('welcomeMessage');
-          m.textContent = 'Thanks for signing in! Once approved, you can add events via the popup.';
-          m.style.display = 'block';
-        }
-        document.getElementById('signinButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'block';
-        if (await checkAdminStatus(uid)) {
-          document.getElementById('approvalsLink').style.display = 'list-item';
-        }
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('signinButton').addEventListener('click', showAuthModal);
-      document.getElementById('closeEventModal').addEventListener('click', () =>
-        document.getElementById('eventModal').style.display = 'none'
-      );
-      document.getElementById('addEventBtn').addEventListener('click', () => {
-        document.getElementById('modalTitle').textContent = 'Add Event';
-        document.getElementById('eventModalForm').reset();
-        document.getElementById('eventId').value = '';
-        document.getElementById('eventModal').style.display = 'flex';
-      });
-
-      // Inline submit handler to avoid undefined function:
-      document.getElementById('eventModalForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('eventId').value;
-        const payload = {
-          title:       document.getElementById('modalTitleInput').value,
-          description: document.getElementById('modalDescription').value,
-          event_start: document.getElementById('modalStart').value,
-          event_end:   document.getElementById('modalEnd').value || null,
-          image_url:   document.getElementById('modalImageUrl').value
-        };
-        if (id) {
-          await supabase.from('events').update(payload).eq('id', id);
-        } else {
-          const { data: { user } } = await supabase.auth.getUser();
-          payload.user_id = user.id;
-          await supabase.from('events').insert([payload]);
-        }
-        document.getElementById('eventModal').style.display = 'none';
-        await loadEvents();
-      });
-
-      init();
-    });
-  </script>
-</body>
-</html>
+::contentReference[oaicite:0]{index=0}
