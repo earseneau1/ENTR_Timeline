@@ -1,77 +1,76 @@
 # Entrepreneurship History Timeline
 
-## Overview
+## 🔔 Course Integration
 
-This web‑based timeline tool was developed for ENTR 20263: Entrepreneurship & Innovation. The primary learning objective is to introduce students to modern, AI‑assisted software workflows, not to delve into advanced programming techniques. Through guided interaction with the codebase—and by leveraging generative AI—students will:
+This web-based timeline is not just a demo—it's a required assignment in **ENTR 20263: Entrepreneurship & Innovation**. Students will actively contribute to the project as part of their coursework. The assignment invites students to explore key historical moments in entrepreneurship while simultaneously developing fluency with AI-assisted software development workflows. This hands-on experience is designed to complement class discussions on creativity, innovation, and technological change.
 
-- **Explore a no‑code/low‑code mindset**: Understand how today’s platforms can accelerate development.
-- **Appreciate AI integration**: See how AI agents can modify, refactor, and extend real software.
-- **Collaborate on code**: Propose and implement feature requests (e.g., new timeline views, data sources).
+As part of the assignment, students are required to:
 
-Ultimately, the goal is to foster **software fluency** and inspire creative applications of AI in entrepreneurship.
+* Research and contribute **at least three significant events** in the history of entrepreneurship and innovation.
+* Use generative AI tools (e.g., ChatGPT, GitHub Copilot) to propose and implement software enhancements.
+* Reflect on the role of AI, databases, and software platforms in entrepreneurial practice.
 
----
+## 🧠 Learning Objectives
 
-## Features
+This project is designed not to teach advanced programming but to immerse students in modern AI-enabled software processes. By interacting with the codebase and using generative AI, students will:
 
-- **Interactive Timeline View**  Displays historical or future events with smooth animations and a scroll‑driven background effect.
+* **Explore no-code/low-code workflows**: Understand how platforms like Supabase, GitHub, and modern JS libraries accelerate development.
+* **Engage with AI tools**: Use agents and assistants to refactor code, suggest features, and improve UX/UI.
+* **Collaborate on software**: Submit feature ideas and enhancements as pull requests with clear AI-generated context.
 
-- **Supabase Authentication & Authorization**
+## ✨ Features
 
-  - *Magic link* sign‑in for students.
-  - Approval workflow: new users request access, admins review pending requests.
-  - Role check to display an **Approvals** tab for administrators.
+### Interactive Timeline View
 
-- **Event Contribution**
+* Scroll-driven animation and rich event descriptions
+* Designed to visualize key moments in innovation and entrepreneurship
 
-  - Signed‑in and approved students can add new timeline events.
-  - Data is persisted in a Supabase table (`events`).
+### Supabase Authentication
 
-- **AI‑Friendly Codebase**  Encourages students to use generative AI tools (e.g., ChatGPT) to propose, test, and implement changes.
+* **Magic link sign-in** using university emails
+* **Approval workflow** for managing new student users
+* **Role-based UI** for admin views
 
----
+### Event Contribution
 
-## Usage in ENTR 20263
+* Approved students can submit new timeline entries via form
+* All entries are stored in a centralized Supabase table
 
-1. **Sign in** using your university email to receive a magic link.
-2. **Wait for admin approval**: Your access request is automatically routed to the course instructor (admin).
-3. **Add events**: Once approved, the "Add Event" form appears on the Home tab.
-4. **Experiment with AI**: Students are encouraged to use AI tools (e.g., GitHub Copilot, ChatGPT) to:
-   - Refactor CSS for theme customization
-   - Add new event filters or search capabilities
-   - Integrate alternative data sources (CSV upload, external APIs)
-   - Implement additional authentication flows
+### AI-Friendly Architecture
 
----
+* Built to encourage experimentation with generative AI
+* Lightweight, documented codebase designed for prompt engineering
 
-## Contributing
+## 🧪 How It Works in ENTR 20263
 
-- Fork the repository and create feature branches.
-- Use AI to draft pull requests—include prompts, AI‑generated code, and your own edits.
-- Submit a pull request with a clear description of your changes and the AI prompts you used.
+1. **Sign in** with your university email to trigger the magic link login.
+2. **Wait for approval** from your instructor (admin).
+3. **Research and contribute**: Add three timeline entries on historically significant events.
+4. **Experiment with AI** tools to propose one code or feature improvement.
+5. **Submit a reflection** on what you learned about software, AI, and the innovation process.
 
----
+## 🔧 Contributing as a Student
 
-## Educational Outcomes
+* Fork this repo and work in a feature branch.
+* Use AI to generate/refactor code (and include your prompts in PRs).
+* Clearly describe the reasoning behind your feature in the PR summary.
 
-By the end of this project, students will:
+## 🎓 Educational Outcomes
 
-- Recognize the power and limitations of AI in code generation.
-- Understand how a database connects to a single page app (SPA).
-- Understand the role of authentication and role‑based access for web apps and databases.
-- Develop confidence in proposing software enhancements, even without deep coding expertise.
+By completing this project, students will:
 
----
+* Analyze key events in the evolution of entrepreneurship.
+* Understand how modern web tools (e.g., Supabase, GitHub) power real-time apps.
+* Recognize the **opportunities and constraints** of AI-generated code.
+* Practice proposing and implementing changes without requiring full-stack expertise.
+* Develop confidence in engaging with tech as an entrepreneurial toolset.
 
-## Rebuild it Yourself
+## 🔁 Rebuilding the Project from Scratch
 
-If you want to rebuild this project from scratch, you will need to carefully set up a database schema and configure permissions so that users can only modify their own data, just as we have done here. The only tools required are free:
+Want to rebuild this project? You’ll need:
 
-- **GitHub** (for version control and hosting static web content)
-- **Supabase** (for authentication, database storage, and real-time updates)
+* **GitHub**: for code hosting and collaboration
+* **Supabase**: for database, authentication, and permissions
+* Careful attention to **role-based permissions** so that students can only manage their own data
 
-Beyond those free services, no additional paid tools are necessary.
-
----
-
-*This project is maintained by Eric Arseneau at the Neeley School of Business - Texas Christian University.*
+All of this can be done using free tools—no paid software is required.
